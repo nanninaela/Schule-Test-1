@@ -44,6 +44,10 @@ Die Bestwerte pro Szenario werden nur im Browser der jeweiligen Person gespeiche
 - **Empfohlen: den Link per AirDrop teilen.** Ein per AirDrop empfangener Link öffnet sich direkt in Safari. Dafür braucht es weder ein Apple-Konto noch den App Store, nur Internet.
 - **Die Datei `index.html` per AirDrop teilen:** Sie landet in der Dateien-App. Deren Vorschau führt oft kein JavaScript aus. Dann erscheint ein Hinweis, die Übung über den Link zu öffnen. Vorher an einem Schüler-iPad testen.
 
+## Präsentation zur Vorbereitung
+
+`praesentation/Verkaufsgespraech_Vorbereitung.pptx` (15 Folien) bereitet die Klasse auf die Übungen vor. Sie enthält Lernziele, die 8 Phasen mit Methoden und Beispielen aus den Szenarien, die Kundentypen, eine Anleitung zur App und einen Arbeitsauftrag. Die Sprechernotizen enthalten Hinweise für die Lehrkraft. Erzeugt wird sie mit `praesentation/build-deck.js`.
+
 ## Neue Szenarien ergänzen
 
 Szenarien stehen im Array `SCENARIOS` in `verkaufsgespraech.html`. Jedes Szenario braucht 8 Schritte in der Reihenfolge der Phasen. Jeder Schritt hat drei Antworten mit `s` = 2, 1 und 0 Punkten. Danach `./build.sh` ausführen.
