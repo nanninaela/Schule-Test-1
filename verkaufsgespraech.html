@@ -1,0 +1,581 @@
+<title>Verkaufstraining Laufschuhe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: schmale Gesprächsspalte wie ein Chat, oben Phasenleiste + Stimmungsbarometer, Auswertung als Kassenbon */
+:root {
+  --paper: #f2f4f6;
+  --surface: #ffffff;
+  --ink: #18202b;
+  --muted: #5b6676;
+  --line: #d9dee5;
+  --accent: #2346a0;
+  --accent-ink: #ffffff;
+  --accent-soft: #e3e9f8;
+  --customer: #ffffff;
+  --good: #1d7a4c;
+  --good-soft: #def2e7;
+  --ok: #9a6400;
+  --ok-soft: #fbefd6;
+  --bad: #b5352a;
+  --bad-soft: #f8e1de;
+  --receipt: #fffdf8;
+  --shadow: 0 1px 2px rgba(24, 32, 43, .06), 0 6px 18px rgba(24, 32, 43, .06);
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #12161c; --surface: #1b212a; --ink: #e8ecf2; --muted: #9aa5b5; --line: #2c3440;
+    --accent: #7d9bf0; --accent-ink: #0f1420; --accent-soft: #232d45; --customer: #1f2630;
+    --good: #5fcf94; --good-soft: #17322a; --ok: #e7b45a; --ok-soft: #352a14; --bad: #f08a7e; --bad-soft: #3a1f1c;
+    --receipt: #1e232b; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.25);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #12161c; --surface: #1b212a; --ink: #e8ecf2; --muted: #9aa5b5; --line: #2c3440;
+  --accent: #7d9bf0; --accent-ink: #0f1420; --accent-soft: #232d45; --customer: #1f2630;
+  --good: #5fcf94; --good-soft: #17322a; --ok: #e7b45a; --ok-soft: #352a14; --bad: #f08a7e; --bad-soft: #3a1f1c;
+  --receipt: #1e232b; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.25);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 1.0625rem;
+  line-height: 1.55;
+}
+.wrap { max-width: 760px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 48px; display: grid; gap: 18px; }
+
+header.top { display: grid; gap: 14px; }
+.brand { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+.brand h1 {
+  font-family: var(--f-display); font-weight: 800; font-size: clamp(1.6rem, 4.5vw, 2.2rem);
+  line-height: 1.05; margin: 0; letter-spacing: -.01em; text-wrap: balance;
+}
+.brand .shop { font-family: var(--f-mono); font-size: .8rem; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+
+.status { display: grid; grid-template-columns: 1fr auto; gap: 12px 20px; align-items: end; }
+@media (max-width: 560px) { .status { grid-template-columns: 1fr; } }
+.label { font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 700; }
+
+.phases { list-style: none; margin: 6px 0 0; padding: 0; display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; }
+.phases li { height: 8px; border-radius: 4px; background: var(--line); position: relative; }
+.phases li.done { background: var(--accent); }
+.phases li.now { background: var(--accent); opacity: .45; }
+.phase-name { font-family: var(--f-display); font-weight: 700; font-size: 1rem; margin-top: 6px; min-height: 1.5em; }
+
+.mood { min-width: 210px; }
+.mood-row { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+.mood-bar { flex: 1; height: 10px; border-radius: 5px; background: var(--line); overflow: hidden; }
+.mood-fill { height: 100%; width: 50%; background: var(--ok); transition: width .5s ease, background-color .5s ease; }
+.mood-face { font-family: var(--f-mono); font-size: .9rem; font-weight: 600; min-width: 4.5em; text-align: right; font-variant-numeric: tabular-nums; }
+
+.intro {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px; box-shadow: var(--shadow);
+  display: grid; gap: 12px;
+}
+.intro h2 { font-family: var(--f-display); font-size: 1.35rem; margin: 0; text-wrap: balance; }
+.intro p { margin: 0; max-width: 62ch; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+.fact { border: 1px dashed var(--line); border-radius: 10px; padding: 10px 12px; font-size: .95rem; }
+.fact b { display: block; font-family: var(--f-display); }
+.fact .price { font-family: var(--f-mono); font-variant-numeric: tabular-nums; color: var(--muted); font-size: .85rem; }
+
+.chat { display: grid; gap: 12px; }
+.note {
+  justify-self: center; text-align: center; max-width: 60ch; font-size: .92rem; color: var(--muted);
+  font-style: italic; padding: 2px 8px;
+}
+.note strong { font-style: normal; color: var(--ink); }
+.msg { display: grid; gap: 4px; max-width: 86%; animation: pop .25s ease both; }
+.msg .who { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 700; }
+.msg .bubble { padding: 10px 14px; border-radius: 16px; min-width: 0; overflow-wrap: anywhere; }
+.msg.customer { justify-self: start; }
+.msg.customer .bubble { background: var(--customer); border: 1px solid var(--line); border-top-left-radius: 4px; }
+.msg.seller { justify-self: end; text-align: right; }
+.msg.seller .bubble { background: var(--accent); color: var(--accent-ink); border-top-right-radius: 4px; text-align: left; }
+.msg .bubble em { opacity: .8; }
+
+.feedback {
+  border-radius: 12px; padding: 12px 14px; display: grid; gap: 4px; font-size: .95rem;
+  border: 1px solid transparent; animation: pop .25s ease both;
+}
+.feedback .verdict { font-family: var(--f-display); font-weight: 700; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.feedback .pts { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-weight: 600; }
+.feedback.good { background: var(--good-soft); border-color: var(--good); }
+.feedback.good .verdict { color: var(--good); }
+.feedback.ok { background: var(--ok-soft); border-color: var(--ok); }
+.feedback.ok .verdict { color: var(--ok); }
+.feedback.bad { background: var(--bad-soft); border-color: var(--bad); }
+.feedback.bad .verdict { color: var(--bad); }
+.feedback .tip { color: var(--ink); margin-top: 2px; }
+.feedback .tip b { font-weight: 700; }
+
+.dock {
+  position: sticky; bottom: env(safe-area-inset-bottom, 0px);
+  background: var(--paper); padding-block: 10px 4px; display: grid; gap: 10px;
+  border-top: 1px solid var(--line);
+}
+.dock .ask { font-family: var(--f-display); font-weight: 700; font-size: 1rem; }
+.choices { display: grid; gap: 8px; }
+.choice {
+  font: inherit; font-size: 1rem; text-align: left; cursor: pointer;
+  background: var(--surface); color: var(--ink); border: 1.5px solid var(--line); border-radius: 12px;
+  padding: 11px 14px; display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start;
+  transition: border-color .15s, background-color .15s, transform .1s;
+}
+.choice:hover { border-color: var(--accent); background: var(--accent-soft); }
+.choice:active { transform: translateY(1px); }
+.choice .key {
+  font-family: var(--f-mono); font-weight: 600; font-size: .85rem; color: var(--accent);
+  border: 1.5px solid currentColor; border-radius: 6px; width: 1.8em; height: 1.8em; display: grid; place-items: center;
+}
+.btn {
+  font: inherit; font-family: var(--f-display); font-weight: 700; font-size: 1rem; cursor: pointer;
+  background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 12px; padding: 12px 20px;
+  justify-self: start;
+}
+.btn.ghost { background: transparent; color: var(--accent); border: 1.5px solid var(--accent); }
+.btn-row { display: flex; flex-wrap: wrap; gap: 10px; }
+button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* Kassenbon-Auswertung */
+.receipt {
+  background: var(--receipt); color: var(--ink); font-family: var(--f-mono); font-size: .88rem;
+  max-width: 460px; width: 100%; justify-self: center; padding: 22px 20px 26px; box-shadow: var(--shadow);
+  position: relative; animation: pop .3s ease both;
+  -webkit-mask: radial-gradient(circle 6px at 50% 100%, transparent 98%, #000) 0 0 / 14px 100% repeat-x;
+          mask: radial-gradient(circle 6px at 50% 100%, transparent 98%, #000) 0 0 / 14px 100% repeat-x;
+}
+.receipt h3 { text-align: center; margin: 0 0 2px; font-size: 1rem; letter-spacing: .1em; }
+.receipt .center { text-align: center; color: var(--muted); }
+.receipt hr { border: 0; border-top: 1.5px dashed var(--line); margin: 12px 0; }
+.receipt .row { display: grid; grid-template-columns: 1fr auto; gap: 12px; font-variant-numeric: tabular-nums; }
+.receipt .row + .row { margin-top: 4px; }
+.receipt .row .sub { color: var(--muted); font-size: .8rem; display: block; }
+.receipt .total { font-weight: 600; font-size: 1rem; }
+.receipt .grade { text-align: center; font-family: var(--f-display); font-size: 1.5rem; font-weight: 800; margin-top: 4px; }
+.receipt .verdict-text { text-align: center; font-family: var(--f-body); font-size: .95rem; margin-top: 6px; }
+.r-good { color: var(--good); } .r-ok { color: var(--ok); } .r-bad { color: var(--bad); }
+
+.cheats { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; display: grid; gap: 10px; }
+.cheats h3 { font-family: var(--f-display); margin: 0; font-size: 1.15rem; }
+.cheats ol { margin: 0; padding-left: 1.4em; display: grid; gap: 6px; }
+.cheats li { max-width: 64ch; }
+.cheats li b { font-family: var(--f-display); }
+
+@keyframes pop { from { opacity: .3; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>Verkaufstraining Laufschuhe</h1>
+      <span class="shop">Sporthaus Laufwerk · Abteilung Running</span>
+    </div>
+    <div class="status">
+      <div>
+        <div class="label" id="phase-label">Phase 0 von 8</div>
+        <ol class="phases" id="phases" aria-hidden="true"></ol>
+        <div class="phase-name" id="phase-name">Vorbereitung</div>
+      </div>
+      <div class="mood">
+        <div class="label">Kundenstimmung</div>
+        <div class="mood-row">
+          <div class="mood-bar" role="meter" aria-label="Kundenstimmung" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" id="mood-bar">
+            <div class="mood-fill" id="mood-fill"></div>
+          </div>
+          <span class="mood-face" id="mood-face">neutral</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="chat" id="chat" aria-live="polite"></main>
+
+  <section class="dock" id="dock"></section>
+</div>
+
+<script>
+(function () {
+  const PRODUCTS = [
+    { name: "Basic Jog", price: "39,95 €", info: "einfacher Freizeitschuh, wenig Dämpfung" },
+    { name: "AeroRun 3", price: "89,95 €", info: "Einsteiger-Laufschuh, starke Dämpfung, für Asphalt" },
+    { name: "PacePro Carbon", price: "179,95 €", info: "Wettkampfschuh mit Carbonplatte" },
+    { name: "Laufsocken Comfort", price: "12,95 €", info: "gepolstert, schützen vor Blasen" }
+  ];
+
+  // Jede Phase: Situation, optionale Kundenaussage, drei Antworten (2 = gut, 1 = mittel, 0 = schlecht)
+  const STEPS = [
+    {
+      phase: "Kontaktaufnahme",
+      situation: "Eine Kundin steht seit einer Minute vor dem Laufschuhregal und nimmt immer wieder einen Schuh in die Hand. Sie sind gerade frei.",
+      ask: "Wie sprechen Sie die Kundin an?",
+      options: [
+        { score: 2, text: "(gehen hin, lächeln) „Guten Tag! Das ist unser AeroRun – ein sehr beliebter Laufschuh. Laufen Sie eher auf der Straße oder im Gelände?“",
+          reaction: "Hallo! Auf der Straße. Ich will mit dem Laufen anfangen und habe ehrlich gesagt keine Ahnung, worauf ich achten muss.",
+          tip: "Sie haben die Kundin <b>warenbezogen</b> angesprochen: Sie knüpfen an den Artikel an, den sie in der Hand hält, und stellen gleich eine offene Frage. So kommt sofort ein Gespräch zustande." },
+        { score: 1, text: "„Kann ich Ihnen helfen?“",
+          reaction: "Ähm … ich schaue eigentlich nur. Na ja, ich suche Laufschuhe. Ich will mit dem Laufen anfangen.",
+          tip: "Freundlich, aber eine <b>geschlossene Frage</b>. Auf „Kann ich helfen?“ antworten viele Kunden reflexartig mit „Nein, ich schaue nur“. Besser: an die Ware anknüpfen." },
+        { score: 0, text: "(rufen von der Kasse) „Wenn was ist, melden Sie sich einfach!“",
+          reaction: "(kommt nach einer Weile zur Kasse) Entschuldigung … ich suche Laufschuhe. Ich will mit dem Laufen anfangen.",
+          tip: "Zurufen aus der Distanz wirkt desinteressiert. Gehen Sie zur Kundschaft hin, halten Sie <b>Blickkontakt</b> und begrüßen Sie freundlich." }
+      ]
+    },
+    {
+      phase: "Bedarfsermittlung",
+      situation: "Die Kundin möchte mit dem Laufen beginnen. Bevor Sie Ware zeigen, müssen Sie wissen, was sie braucht.",
+      ask: "Was fragen Sie?",
+      options: [
+        { score: 2, text: "„Wie oft möchten Sie denn laufen, wie lange ungefähr und auf welchem Untergrund? Gibt es irgendwelche Beschwerden, auf die wir achten sollten?“",
+          reaction: "Zwei- bis dreimal die Woche, so 30 Minuten, meistens auf Asphalt im Park. Und mein linkes Knie zwickt manchmal.",
+          tip: "Gut: <b>offene Fragen</b> (W-Fragen) liefern viele Informationen. Sie kennen jetzt Häufigkeit, Untergrund und das Knieproblem, also das, was für die Schuhauswahl zählt." },
+        { score: 1, text: "„Wollen Sie denn viel laufen?“",
+          reaction: "Hm, schon regelmäßig, denke ich. … Ach ja, auf Asphalt meistens. Und mein Knie zwickt manchmal.",
+          tip: "Eine <b>geschlossene Frage</b> bringt nur Ja/Nein. Die wichtigen Infos kamen hier nur zufällig. Fragen Sie gezielt mit „Wie …?“, „Wo …?“, „Wie oft …?“." },
+        { score: 0, text: "„Nehmen Sie einfach den hier, der verkauft sich am besten.“",
+          reaction: "Aber ich weiß doch gar nicht, ob der zu mir passt … Ich laufe auf Asphalt, und mein Knie macht manchmal Probleme.",
+          tip: "Ohne <b>Bedarfsermittlung</b> empfehlen Sie ins Blaue. Die Kundin fühlt sich nicht ernst genommen. Erst fragen, dann zeigen." }
+      ]
+    },
+    {
+      phase: "Warenvorlage",
+      situation: "Sie wissen jetzt: 2–3× pro Woche, ca. 30 Minuten, Asphalt, leichte Knieprobleme. Im Regal stehen u. a. Basic Jog (39,95 €), AeroRun 3 (89,95 €) und PacePro Carbon (179,95 €).",
+      ask: "Wie legen Sie die Ware vor?",
+      options: [
+        { score: 2, text: "Sie holen den AeroRun 3 und ein zweites gedämpftes Modell in ihrer Größe. „Probieren Sie ruhig beide an und laufen Sie ein paar Schritte auf unserem Laufband.“",
+          reaction: "(läuft auf dem Laufband) Oh, der AeroRun fühlt sich richtig weich an!",
+          tip: "Richtig: <b>wenige, passende Artikel</b> (2–3) aus der <b>mittleren Preislage</b> und die Ware in die Hand geben. Wer selbst ausprobiert, überzeugt sich mit allen Sinnen." },
+        { score: 0, text: "Sie zeigen direkt den PacePro Carbon. „Das ist unser bester Schuh, damit laufen die Profis.“",
+          reaction: "179,95 Euro?! Ich will doch erst mal anfangen …",
+          tip: "Der Wettkampfschuh passt nicht zum <b>Bedarf</b> einer Einsteigerin. Wer am Bedarf vorbei verkauft, wirkt unseriös. Beginnen Sie mit der mittleren Preislage." },
+        { score: 1, text: "Sie stellen sechs verschiedene Laufschuhe vor ihr auf den Boden. „Suchen Sie sich einfach was aus.“",
+          reaction: "Puh, so viele … da weiß ich ja gar nicht mehr, welcher was ist.",
+          tip: "Zu viel Auswahl <b>überfordert</b>. Zeigen Sie höchstens drei Artikel und lassen Sie die Kundin anprobieren." }
+      ]
+    },
+    {
+      phase: "Verkaufsargumentation",
+      situation: "Die Kundin hält den AeroRun 3 in der Hand und schaut ihn sich genau an.",
+      customer: "Was ist denn an dem hier besonders?",
+      ask: "Wie argumentieren Sie?",
+      options: [
+        { score: 2, text: "„Der AeroRun hat eine besonders dicke, weiche Zwischensohle. Die fängt den Aufprall auf dem Asphalt ab und entlastet so Ihr Knie bei jedem Schritt.“",
+          reaction: "Das klingt gut, genau das brauche ich für mein Knie.",
+          tip: "Perfekt: <b>Eigenschaft → Vorteil → Nutzen</b> im <b>Sie-Stil</b>. Die Kundin hört nicht nur, was der Schuh hat, sondern was er <i>ihr</i> bringt." },
+        { score: 0, text: "„Der hat eine EVA-Zwischensohle mit 8 mm Sprengung und eine TPU-Fersenkappe.“",
+          reaction: "Äh … Sprengung? Was heißt das denn?",
+          tip: "<b>Fachchinesisch</b> ohne Erklärung. Nennen Sie nicht nur Eigenschaften, sondern übersetzen Sie sie in einen <b>Kundennutzen</b>." },
+        { score: 1, text: "„Wir finden den super, den verkaufen wir am meisten.“",
+          reaction: "Na ja … aber ob der auch für mich der Richtige ist?",
+          tip: "Das ist <b>Wir-Stil</b>: Es geht um das Geschäft, nicht um die Kundin. Beliebtheit kann ein Zusatzargument sein, ersetzt aber nicht den persönlichen Nutzen." }
+      ]
+    },
+    {
+      phase: "Preisnennung",
+      situation: "Die Kundin dreht den Schuh um und sucht das Preisschild.",
+      customer: "Und was kostet der?",
+      ask: "Wie nennen Sie den Preis?",
+      options: [
+        { score: 2, text: "„Mit der starken Dämpfung schonen Sie Ihr Knie. Der AeroRun kostet 89,95 €, und die Sohle hält gut 800 Kilometer, also mehrere Jahre bei Ihrem Trainingspensum.“",
+          reaction: "Hm, verstehe. Das ist schon eine Investition …",
+          tip: "Das ist die <b>Sandwich-Methode</b>: Nutzen – Preis – Nutzen. Der Preis steht nicht allein da, sondern ist von Argumenten „eingepackt“." },
+        { score: 0, text: "„89,95 €. Ist leider nicht ganz billig, ich weiß.“",
+          reaction: "Oh. Na, wenn Sie das schon selbst sagen …",
+          tip: "Nie für den Preis <b>entschuldigen</b>! Wörter wie „leider“ oder „nur“ werten die Ware ab. Nennen Sie den Preis selbstbewusst zusammen mit dem Nutzen." },
+        { score: 1, text: "„89,95 €.“",
+          reaction: "Aha.",
+          tip: "Sachlich korrekt, aber der Preis steht <b>nackt</b> im Raum. Verbinden Sie ihn mit dem Nutzen für die Kundin (Sandwich-Methode)." }
+      ]
+    },
+    {
+      phase: "Einwandbehandlung",
+      situation: "Die Kundin zögert und stellt den Schuh kurz ab.",
+      customer: "90 Euro … Im Internet gibt es Laufschuhe doch schon für 40 Euro.",
+      ask: "Wie reagieren Sie auf den Einwand?",
+      options: [
+        { score: 2, text: "„Ja, da haben Sie recht, es gibt günstigere Schuhe. Dieser hier hat aber genau die Dämpfung, die Ihr Knie braucht. Und Sie haben ihn gerade auf dem Laufband getestet, Sie wissen also, dass er passt.“",
+          reaction: "Stimmt, ausprobieren konnte ich ihn nur hier. Und mein Knie ist mir das wert.",
+          tip: "Klassische <b>Ja-aber-Methode</b>: Sie geben der Kundin zunächst recht und lenken dann auf die Vorteile. Der Einwand wird ernst genommen, nicht weggewischt." },
+        { score: 0, text: "„Da kaufen Sie aber nur Schrott. Das ist doch überhaupt kein Vergleich.“",
+          reaction: "(verschränkt die Arme) Na, so schlecht sind die bestimmt nicht.",
+          tip: "Sie <b>widersprechen direkt</b> und werten die Meinung der Kundin ab. Das führt zu Trotz. Einwände sind Kaufsignale. Nehmen Sie sie ernst." },
+        { score: 1, text: "„Dann kann ich Ihnen auch den Basic Jog für 39,95 € zeigen.“",
+          reaction: "Aber der hat doch kaum Dämpfung, oder? … Ich glaube, ich bleibe lieber beim AeroRun.",
+          tip: "Ein günstigeres Angebot ist möglich, aber hier <b>passt es nicht zum Bedarf</b> (Knie!). Wer sofort ausweicht, signalisiert: Der Preis war wohl doch zu hoch." }
+      ]
+    },
+    {
+      phase: "Ergänzungsangebot",
+      situation: "Die Kundin überlegt kurz und nickt dann.",
+      customer: "Okay, dann nehme ich den AeroRun.",
+      ask: "Was sagen Sie jetzt?",
+      options: [
+        { score: 2, text: "„Prima! Damit Sie beim Einlaufen keine Blasen bekommen, empfehle ich Ihnen dazu unsere gepolsterten Laufsocken für 12,95 €.“",
+          reaction: "Ach, an Socken hab ich gar nicht gedacht. Die nehme ich mit!",
+          tip: "Gutes <b>Ergänzungsangebot</b>: Es passt zum Hauptartikel, hat einen klaren Nutzen und kommt <b>nach</b> dem Kaufentschluss." },
+        { score: 0, text: "„Brauchen Sie noch was? Wir haben auch Rucksäcke, Trinkflaschen, Pulsuhren, Jacken …“",
+          reaction: "Nein danke, das ist mir jetzt echt zu viel.",
+          tip: "<b>Wahllos</b> Artikel aufzuzählen wirkt aufdringlich. Bieten Sie gezielt <b>einen</b> Artikel an, der zum Kauf passt." },
+        { score: 1, text: "„Super, dann gehen wir zur Kasse.“",
+          reaction: "Gerne.",
+          tip: "Kein Fehler, aber eine <b>verpasste Chance</b>. Ein passendes Zusatzangebot (z. B. Socken, Pflegemittel) ist ein Service für die Kundin." }
+      ]
+    },
+    {
+      phase: "Abschluss & Verabschiedung",
+      situation: "An der Kasse: Die Kundin hat bezahlt und nimmt die Tüte.",
+      ask: "Wie verabschieden Sie sich?",
+      options: [
+        { score: 2, text: "„Vielen Dank für Ihren Einkauf! Ein Tipp: Laufen Sie die Schuhe die ersten zwei, drei Male locker ein. Viel Spaß beim Laufen, und sagen Sie gern Bescheid, wie es klappt!“",
+          reaction: "Danke, Sie haben mich echt gut beraten! Ich komme bestimmt wieder.",
+          tip: "Starker Abschluss: Sie <b>bestätigen die Kaufentscheidung</b>, geben einen Nutzungstipp und verabschieden sich persönlich. So entsteht <b>Kundenbindung</b>." },
+        { score: 0, text: "(schauen schon zum nächsten Kunden) „Tschüss.“",
+          reaction: "(geht ohne Gruß)",
+          tip: "Der letzte Eindruck bleibt! Eine knappe, abgewandte Verabschiedung entwertet das ganze Gespräch." },
+        { score: 1, text: "„Danke, schönen Tag noch.“",
+          reaction: "Ihnen auch.",
+          tip: "Höflich, aber austauschbar. Eine <b>Kaufbestätigung</b> oder ein kleiner Tipp zur Ware macht die Verabschiedung persönlich." }
+      ]
+    }
+  ];
+
+  const MOOD_DELTA = { 2: 15, 1: -5, 0: -20 };
+  const RATING = {
+    2: { cls: "good", label: "Sehr gut" },
+    1: { cls: "ok", label: "Geht besser" },
+    0: { cls: "bad", label: "Ungünstig" }
+  };
+  const MAX = STEPS.length * 2;
+
+  const chat = document.getElementById("chat");
+  const dock = document.getElementById("dock");
+  const phasesEl = document.getElementById("phases");
+  const phaseLabel = document.getElementById("phase-label");
+  const phaseName = document.getElementById("phase-name");
+  const moodFill = document.getElementById("mood-fill");
+  const moodFace = document.getElementById("mood-face");
+  const moodBar = document.getElementById("mood-bar");
+
+  let state;
+
+  function el(tag, cls, html) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (html != null) e.innerHTML = html;
+    return e;
+  }
+  function shuffle(a) {
+    const r = a.slice();
+    for (let i = r.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [r[i], r[j]] = [r[j], r[i]];
+    }
+    return r;
+  }
+  function scrollDown() {
+    requestAnimationFrame(() => dock.scrollIntoView({ block: "end", behavior: "smooth" }));
+  }
+
+  function renderPhases() {
+    phasesEl.innerHTML = "";
+    STEPS.forEach((_, i) => {
+      const li = el("li");
+      if (i < state.step) li.classList.add("done");
+      else if (i === state.step && !state.over) li.classList.add("now");
+      phasesEl.appendChild(li);
+    });
+    const shown = Math.min(state.step + 1, STEPS.length);
+    if (state.over) {
+      phaseLabel.textContent = "Gespräch beendet";
+      phaseName.textContent = "Auswertung";
+    } else {
+      phaseLabel.textContent = "Phase " + shown + " von " + STEPS.length;
+      phaseName.textContent = STEPS[state.step].phase;
+    }
+  }
+
+  function renderMood() {
+    const m = state.mood;
+    moodFill.style.width = m + "%";
+    moodBar.setAttribute("aria-valuenow", m);
+    let word, color;
+    if (m >= 75) { word = "begeistert"; color = "var(--good)"; }
+    else if (m >= 55) { word = "zufrieden"; color = "var(--good)"; }
+    else if (m >= 35) { word = "neutral"; color = "var(--ok)"; }
+    else if (m >= 15) { word = "genervt"; color = "var(--bad)"; }
+    else { word = "verärgert"; color = "var(--bad)"; }
+    moodFill.style.backgroundColor = color;
+    moodFace.textContent = word;
+  }
+
+  function addNote(html) { chat.appendChild(el("p", "note", html)); }
+  function addMsg(who, text) {
+    const m = el("div", "msg " + who);
+    m.appendChild(el("span", "who", who === "seller" ? "Sie" : "Kundin"));
+    m.appendChild(el("div", "bubble", text));
+    chat.appendChild(m);
+  }
+
+  function showIntro() {
+    const box = el("section", "intro");
+    box.appendChild(el("h2", null, "Ihre Rolle: Verkäufer/in im Sporthaus"));
+    box.appendChild(el("p", null, "Sie führen ein komplettes Verkaufsgespräch in acht Phasen: von der Begrüßung bis zur Verabschiedung. In jeder Phase wählen Sie eine von drei Antworten. Die Kundin reagiert darauf, und Sie bekommen sofort eine Rückmeldung mit dem passenden Fachbegriff. Wird die Kundin zu sehr verärgert, verlässt sie den Laden."));
+    box.appendChild(el("p", "label", "Sortiment im Gespräch"));
+    const facts = el("div", "facts");
+    PRODUCTS.forEach(p => {
+      facts.appendChild(el("div", "fact", "<b>" + p.name + "</b><span class=\"price\">" + p.price + "</span><br>" + p.info));
+    });
+    box.appendChild(facts);
+    chat.appendChild(box);
+
+    dock.innerHTML = "";
+    const start = el("button", "btn", "Gespräch starten");
+    start.type = "button";
+    start.id = "start-btn";
+    start.addEventListener("click", () => { chat.innerHTML = ""; showStep(); });
+    dock.appendChild(start);
+  }
+
+  function showStep() {
+    const s = STEPS[state.step];
+    renderPhases();
+    addNote("<strong>" + s.phase + ".</strong> " + s.situation);
+    if (s.customer) addMsg("customer", s.customer);
+
+    dock.innerHTML = "";
+    dock.appendChild(el("div", "ask", s.ask));
+    const list = el("div", "choices");
+    shuffle(s.options).forEach((opt, i) => {
+      const b = el("button", "choice");
+      b.type = "button";
+      b.id = "choice-" + state.step + "-" + i;
+      b.innerHTML = "<span class=\"key\">" + "ABC"[i] + "</span><span>" + opt.text + "</span>";
+      b.addEventListener("click", () => choose(opt));
+      list.appendChild(b);
+    });
+    dock.appendChild(list);
+    scrollDown();
+  }
+
+  function choose(opt) {
+    const s = STEPS[state.step];
+    state.results.push({ phase: s.phase, score: opt.score });
+    state.points += opt.score;
+    state.mood = Math.max(0, Math.min(100, state.mood + MOOD_DELTA[opt.score]));
+
+    addMsg("seller", opt.text);
+    addMsg("customer", opt.reaction);
+    const r = RATING[opt.score];
+    const fb = el("div", "feedback " + r.cls);
+    fb.appendChild(el("div", "verdict", "<span>" + r.label + "</span><span class=\"pts\">+" + opt.score + " / 2 Punkte</span>"));
+    fb.appendChild(el("div", "tip", opt.tip));
+    chat.appendChild(fb);
+    renderMood();
+
+    state.step++;
+    const left = state.mood <= 0 && state.step < STEPS.length;
+    dock.innerHTML = "";
+    if (left) {
+      addMsg("customer", "Wissen Sie was … ich überlege mir das noch mal. Tschüss.");
+      addNote("<strong>Die Kundin verlässt das Geschäft.</strong> Ihre Stimmung ist auf dem Tiefpunkt.");
+      state.left = true;
+    }
+    const next = el("button", "btn", left || state.step >= STEPS.length ? "Zur Auswertung" : "Weiter");
+    next.type = "button";
+    next.id = "next-btn";
+    next.addEventListener("click", () => (left || state.step >= STEPS.length) ? showResult() : showStep());
+    dock.appendChild(next);
+    scrollDown();
+    next.focus({ preventScroll: true });
+  }
+
+  function grade(points, left) {
+    if (left) return { note: "6", text: "Die Kundin ist gegangen. Kein Verkauf! Schauen Sie sich die Merksätze an und versuchen Sie es noch einmal." };
+    const p = points / MAX;
+    if (p >= 0.92) return { note: "1", text: "Verkaufsprofi! Sie haben die Kundin bedarfsgerecht beraten und an sich gebunden." };
+    if (p >= 0.81) return { note: "2", text: "Sehr ordentlich. Mit ein paar Feinheiten wird das ein Spitzengespräch." };
+    if (p >= 0.67) return { note: "3", text: "Solide Grundlage. Achten Sie besonders auf die Phasen mit wenig Punkten." };
+    if (p >= 0.50) return { note: "4", text: "Verkauft, aber mit Glück. Wiederholen Sie die Theorie der schwachen Phasen." };
+    if (p >= 0.30) return { note: "5", text: "Die Kundin war wenig überzeugt. Lesen Sie die Merksätze und starten Sie neu." };
+    return { note: "6", text: "Da ist noch viel Luft nach oben. Probieren Sie es gleich noch einmal!" };
+  }
+
+  function showResult() {
+    state.over = true;
+    renderPhases();
+    dock.innerHTML = "";
+
+    const g = grade(state.points, state.left);
+    const now = new Date();
+    const stamp = now.toLocaleDateString("de-DE") + " " + now.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+
+    const rc = el("section", "receipt");
+    rc.setAttribute("aria-label", "Auswertung");
+    let html = "<h3>SPORTHAUS LAUFWERK</h3><div class=\"center\">Auswertung Verkaufsgespräch<br>" + stamp + "</div><hr>";
+    STEPS.forEach((s, i) => {
+      const r = state.results[i];
+      if (r) {
+        const rt = RATING[r.score];
+        html += "<div class=\"row\"><span>" + s.phase + "<span class=\"sub r-" + rt.cls + "\">" + rt.label + "</span></span><span>" + r.score + ",0 P</span></div>";
+      } else {
+        html += "<div class=\"row\"><span>" + s.phase + "<span class=\"sub\">nicht erreicht</span></span><span>–</span></div>";
+      }
+    });
+    html += "<hr><div class=\"row total\"><span>SUMME</span><span>" + state.points + " / " + MAX + " P</span></div>";
+    html += "<div class=\"row\"><span>Kundenstimmung</span><span>" + state.mood + " %</span></div>";
+    if (!state.left) {
+      const socks = state.results[6] && state.results[6].score === 2;
+      html += "<div class=\"row\"><span>Umsatz</span><span>" + (socks ? "102,90 €" : "89,95 €") + "</span></div>";
+    } else {
+      html += "<div class=\"row\"><span>Umsatz</span><span>0,00 €</span></div>";
+    }
+    html += "<hr><div class=\"center\">Ihre Note</div><div class=\"grade\">" + g.note + "</div><div class=\"verdict-text\">" + g.text + "</div>";
+    rc.innerHTML = html;
+    chat.appendChild(rc);
+
+    const ch = el("section", "cheats");
+    ch.appendChild(el("h3", null, "Merksätze: die 8 Phasen des Verkaufsgesprächs"));
+    ch.appendChild(el("ol", null,
+      "<li><b>Kontaktaufnahme:</b> hingehen, Blickkontakt, freundlich begrüßen, am besten warenbezogen ansprechen.</li>" +
+      "<li><b>Bedarfsermittlung:</b> offene W-Fragen stellen und aktiv zuhören.</li>" +
+      "<li><b>Warenvorlage:</b> 2–3 passende Artikel, mittlere Preislage, Ware in die Hand geben.</li>" +
+      "<li><b>Verkaufsargumentation:</b> Eigenschaft → Vorteil → Nutzen, im Sie-Stil.</li>" +
+      "<li><b>Preisnennung:</b> Sandwich-Methode (Nutzen – Preis – Nutzen), nie entschuldigen.</li>" +
+      "<li><b>Einwandbehandlung:</b> Einwände ernst nehmen, z. B. Ja-aber-Methode.</li>" +
+      "<li><b>Ergänzungsangebot:</b> ein passender Artikel mit klarem Nutzen, nach dem Kaufentschluss.</li>" +
+      "<li><b>Abschluss & Verabschiedung:</b> Kauf bestätigen, Tipp geben, persönlich verabschieden.</li>"
+    ));
+    chat.appendChild(ch);
+
+    const row = el("div", "btn-row");
+    const again = el("button", "btn", "Noch einmal spielen");
+    again.type = "button";
+    again.id = "again-btn";
+    again.addEventListener("click", () => { reset(); chat.innerHTML = ""; showStep(); window.scrollTo({ top: 0 }); });
+    row.appendChild(again);
+    dock.appendChild(row);
+    rc.scrollIntoView({ block: "start", behavior: "smooth" });
+  }
+
+  function reset() {
+    state = { step: 0, points: 0, mood: 50, results: [], over: false, left: false };
+    renderPhases();
+    renderMood();
+  }
+
+  reset();
+  showIntro();
+})();
+</script>
