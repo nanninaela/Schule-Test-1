@@ -23,6 +23,10 @@ In jeder Phase gibt es drei Antworten (gut, mittel, ungünstig) in zufälliger R
 | Ein Duft für Mama | Unentschlossene Kundin | Parfum (Geschenk) | mittel |
 | Der Testsieger-Kenner | Schwieriger Kunde (Besserwisser) | Kaffeevollautomat | schwer |
 
+## Kundenfiguren
+
+Jedes Szenario hat eine eigene gezeichnete Figur. Sie blinzelt, atmet und zeigt ihre Stimmung im Gesicht. Beim Antworten bewegt sie den Mund und liest ihren Text mit der deutschen Sprachausgabe des Geräts vor. Stimmhöhe und Tempo passen zur Person: Herr Albers spricht langsam, Herr Yilmaz hastig. Der Lautsprecher-Knopf schaltet den Ton aus, dann bewegt sich nur der Mund. Verlässt die Kundschaft verärgert den Laden, geht die Figur aus dem Bild.
+
 ## Modi
 
 - **Übung:** Feedback mit Fachbegriff nach jeder Antwort.

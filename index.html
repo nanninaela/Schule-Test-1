@@ -109,8 +109,55 @@ body {
 .best.none { color: var(--muted); font-weight: 400; }
 
 /* Training */
-.status { display: grid; grid-template-columns: 1fr auto; gap: 12px 20px; align-items: end; }
-@media (max-width: 560px) { .status { grid-template-columns: 1fr; } }
+.status { display: grid; gap: 12px; }
+
+/* Bühne mit animierter Kundenfigur */
+.stage {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 10px 14px;
+  box-shadow: var(--shadow);
+}
+.avatar { width: 104px; height: 104px; flex: none; }
+@media (max-width: 480px) { .avatar { width: 80px; height: 80px; } }
+.stage-info { min-width: 0; display: grid; gap: 2px; }
+.stage-name { font-family: var(--f-display); font-weight: 800; font-size: 1.15rem; line-height: 1.2; }
+.stage-sub { font-size: .88rem; color: var(--muted); min-height: 1.4em; }
+.stage-sub.speaking { color: var(--accent); font-weight: 700; }
+.stage .mood { min-width: 0; }
+.stage .mood-row { margin-top: 4px; }
+.sound {
+  font: inherit; cursor: pointer; width: 44px; height: 44px; border-radius: 50%;
+  border: 1.5px solid var(--line); background: var(--paper); color: var(--ink);
+  display: grid; place-items: center; align-self: start;
+}
+.sound svg { width: 22px; height: 22px; }
+.sound[aria-pressed="false"] { color: var(--muted); }
+
+.figure { width: 100%; height: 100%; display: block; overflow: visible; }
+.figure .bg { fill: var(--accent-soft); }
+.figure .person { transform-origin: 60px 118px; animation: breathe 4.2s ease-in-out infinite; }
+.figure .head { transform-origin: 60px 80px; transition: transform .4s ease; }
+.figure .eyes { transform-origin: 60px 52px; animation: blink 4.6s infinite; }
+.figure .mouth-open { display: none; transform-origin: 60px 69px; }
+.figure .brow { transition: transform .4s ease; }
+.figure .mood-good .brow-l { transform: translateY(-1.5px) rotate(-4deg); transform-box: fill-box; transform-origin: center; }
+.figure .mood-good .brow-r { transform: translateY(-1.5px) rotate(4deg); transform-box: fill-box; transform-origin: center; }
+.figure .mood-bad .brow-l { transform: translateY(1.5px) rotate(14deg); transform-box: fill-box; transform-origin: center; }
+.figure .mood-bad .brow-r { transform: translateY(1.5px) rotate(-14deg); transform-box: fill-box; transform-origin: center; }
+.figure.talking .mouth-closed { display: none; }
+.figure.talking .mouth-open { display: inline; animation: talk .16s ease-in-out infinite alternate; }
+.figure.talking .head { animation: nod 1.1s ease-in-out infinite; }
+.figure.thinking .head { transform: rotate(-5deg); }
+.figure.thinking .pupils { transform: translate(2px, -2px); }
+.figure .pupils { transition: transform .3s ease; }
+.figure .sweat { animation: sweat 2.4s ease-in infinite; }
+.figure.gone { animation: walk-off .9s ease-in forwards; }
+.figure.hello { animation: hello .7s cubic-bezier(.2,.9,.3,1.3) both; }
+.card .mini { width: 52px; height: 52px; flex: none; }
+.card .who-row { display: flex; gap: 12px; align-items: center; }
+.intro .who-row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.intro .big { width: 132px; height: 132px; flex: none; }
 .phases { list-style: none; margin: 6px 0 0; padding: 0; display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; }
 .phases li { height: 8px; border-radius: 4px; background: var(--line); }
 .phases li.done { background: var(--accent); }
@@ -238,6 +285,13 @@ details[open] summary { margin-bottom: 10px; }
 
 @keyframes pop { from { opacity: .3; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes breathe { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(1.2px) scaleY(.995); } }
+@keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+@keyframes talk { from { transform: scaleY(.25); } to { transform: scaleY(1); } }
+@keyframes nod { 0%, 100% { transform: rotate(0deg); } 30% { transform: rotate(2deg) translateY(.5px); } 70% { transform: rotate(-1.5deg); } }
+@keyframes sweat { 0% { opacity: 0; transform: translateY(-2px); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(8px); } }
+@keyframes walk-off { to { opacity: 0; transform: translateX(60%) rotate(4deg); } }
+@keyframes hello { from { opacity: 0; transform: translateY(14px) scale(.9); } to { opacity: 1; transform: none; } }
 @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 @keyframes in-left { from { opacity: 0; transform: translateX(-18px) scale(.97); } to { opacity: 1; transform: none; } }
 @keyframes in-right { from { opacity: 0; transform: translateX(18px) scale(.97); } to { opacity: 1; transform: none; } }
@@ -274,15 +328,23 @@ details[open] summary { margin-bottom: 10px; }
         <ol class="phases" id="phases" aria-hidden="true"></ol>
         <div class="phase-name" id="phase-name"></div>
       </div>
-      <div class="mood">
-        <div class="label">Kundenstimmung</div>
-        <div class="mood-row">
-          <div class="mood-bar" role="meter" aria-label="Kundenstimmung" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" id="mood-bar">
-            <div class="mood-fill" id="mood-fill"></div>
+    </div>
+    <div class="stage" id="stage">
+      <div class="avatar" id="avatar" aria-hidden="true"></div>
+      <div class="stage-info">
+        <div class="stage-name" id="stage-name"></div>
+        <div class="stage-sub" id="stage-sub">hört zu</div>
+        <div class="mood">
+          <div class="mood-row">
+            <span class="label">Stimmung</span>
+            <div class="mood-bar" role="meter" aria-label="Kundenstimmung" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" id="mood-bar">
+              <div class="mood-fill" id="mood-fill"></div>
+            </div>
+            <span class="mood-face" id="mood-face">neutral</span>
           </div>
-          <span class="mood-face" id="mood-face">neutral</span>
         </div>
       </div>
+      <button class="sound" type="button" id="sound-btn" aria-pressed="true" title="Sprachausgabe an/aus"></button>
     </div>
     <main class="chat" id="chat" aria-live="polite"></main>
     <section class="dock" id="dock"></section>
@@ -304,6 +366,7 @@ details[open] summary { margin-bottom: 10px; }
       level: 1,
       shop: "Sporthaus Laufwerk",
       who: "Frau Becker",
+      look: { skin: "#f1c7a5", hair: "#8a5a2b", style: "ponytail", band: "#2a9d8f", shirt: "#2a9d8f", collar: "#21867a", female: true, voice: { pitch: 1.1, rate: 1.0 } },
       teaser: "Eine Kundin will mit dem Laufen anfangen und hat Knieprobleme. Ein Gespräch zum Kennenlernen der acht Phasen.",
       profile: [["Kundin", "Frau Becker, ca. 40 Jahre"], ["Situation", "will mit dem Laufen anfangen, kennt sich nicht aus"], ["Stimmung", "offen und freundlich"]],
       startMood: 50,
@@ -446,6 +509,7 @@ details[open] summary { margin-bottom: 10px; }
       level: 2,
       shop: "Elektro Brandt",
       who: "Herr Albers",
+      look: { skin: "#eec1a0", hair: "#e4e4e4", style: "bald", glasses: "round", mustache: true, wrinkles: true, shirt: "#8a7354", collar: "#6f5c42", female: false, voice: { pitch: .8, rate: .85 } },
       teaser: "Ein 78-jähriger Kunde will per Video mit seiner Enkelin telefonieren. Er ist unsicher und kennt die Fachbegriffe nicht.",
       profile: [["Kunde", "Herr Albers, 78 Jahre"], ["Situation", "erstes Smartphone, möchte Videoanrufe mit der Enkelin in Hamburg"], ["Besonderheit", "hört etwas schlecht, braucht Zeit, unsicher bei Technik"]],
       startMood: 50,
@@ -589,6 +653,7 @@ details[open] summary { margin-bottom: 10px; }
       level: 2,
       shop: "Modehaus Krüger",
       who: "Herr Yilmaz",
+      look: { skin: "#c98e62", hair: "#2b1d14", style: "short", beard: "#2b1d14", sweat: true, shirt: "#3d5a80", collar: "#2c4462", female: false, voice: { pitch: 1.0, rate: 1.18 } },
       teaser: "Acht Minuten vor Ladenschluss stürmt ein gestresster Kunde herein. Er fährt morgen früh in die Berge und braucht eine Regenjacke.",
       profile: [["Kunde", "Herr Yilmaz, ca. 35 Jahre"], ["Situation", "fährt morgen früh zum Wandern, braucht dringend eine wetterfeste Jacke"], ["Uhrzeit", "19:52 Uhr, Ladenschluss um 20:00 Uhr"], ["Stimmung", "gestresst und in Eile"]],
       startMood: 40,
@@ -732,6 +797,7 @@ details[open] summary { margin-bottom: 10px; }
       level: 3,
       shop: "Küchenwelt Hansen",
       who: "Herr Brenner",
+      look: { skin: "#f0c4a4", hair: "#8d8d8d", style: "receding", glasses: "square", shirt: "#2f3640", collar: "#dfe4ea", female: false, voice: { pitch: .9, rate: .98 } },
       teaser: "Ein Kunde hat alle Tests gelesen, vergleicht Preise auf dem Handy und prüft Ihre Fachkompetenz. Bleiben Sie sachlich!",
       profile: [["Kunde", "Herr Brenner, ca. 55 Jahre"], ["Situation", "will einen Kaffeevollautomaten, hat sich online informiert"], ["Besonderheit", "kritisch, provozierend, vergleicht Online-Preise"], ["Stimmung", "skeptisch"]],
       startMood: 35,
@@ -876,6 +942,7 @@ details[open] summary { margin-bottom: 10px; }
       level: 2,
       shop: "Parfümerie Duftwerk",
       who: "Lea",
+      look: { skin: "#e8b48f", hair: "#4a2c1d", style: "long", shirt: "#9b5de5", collar: "#7f45c7", female: true, voice: { pitch: 1.3, rate: 1.05 } },
       teaser: "Eine junge Kundin sucht ein Geburtstagsgeschenk für ihre Mutter, hat ein knappes Budget und kann sich nicht entscheiden.",
       profile: [["Kundin", "Lea, 19 Jahre"], ["Situation", "sucht ein Geburtstagsgeschenk für ihre Mutter (Samstag)"], ["Budget", "ca. 50 €"], ["Besonderheit", "unentschlossen, unsicher, hat Angst, das Falsche zu schenken"]],
       startMood: 50,
@@ -1046,6 +1113,149 @@ details[open] summary { margin-bottom: 10px; }
   let runCounter = 0;
   const calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // ---------- Figur (SVG) ----------
+  function figureSVG(look, cls) {
+    const L = look, k = L.skin, h = L.hair;
+    let back = "", top = "", extra = "";
+    if (L.style === "long") {
+      back = "<path d='M33 50 C30 22 90 22 87 50 L90 96 C80 102 40 102 30 96 Z' fill='" + h + "'/>";
+      top = "<path d='M35 46 C36 22 84 22 85 46 C76 36 62 32 46 40 C42 42 38 44 35 46 Z' fill='" + h + "'/>";
+    } else if (L.style === "ponytail") {
+      back = "<path d='M80 34 C98 34 100 62 90 74 C92 58 88 44 80 42 Z' fill='" + h + "'/>";
+      top = "<path d='M35 48 C34 20 86 20 85 48 C78 34 62 30 48 34 C42 36 37 42 35 48 Z' fill='" + h + "'/>" +
+            "<path d='M36 40 C48 30 72 30 84 40' stroke='" + L.band + "' stroke-width='4' fill='none' stroke-linecap='round'/>";
+    } else if (L.style === "short") {
+      top = "<path d='M35 46 C33 20 87 20 85 46 C84 38 80 34 74 33 C64 30 52 31 44 34 C38 37 36 41 35 46 Z' fill='" + h + "'/>";
+    } else if (L.style === "receding") {
+      top = "<path d='M35 50 C33 36 38 30 44 30 L44 40 C40 42 37 46 35 50 Z M85 50 C87 36 82 30 76 30 L76 40 C80 42 83 46 85 50 Z' fill='" + h + "'/>" +
+            "<path d='M44 30 C52 25 68 25 76 30 C68 28 52 28 44 30 Z' fill='" + h + "'/>";
+    } else if (L.style === "bald") {
+      top = "<path d='M35 54 C33 44 36 38 40 36 L41 48 C38 50 36 52 35 54 Z M85 54 C87 44 84 38 80 36 L79 48 C82 50 84 52 85 54 Z' fill='" + h + "'/>";
+    }
+    if (L.beard) extra += "<path d='M38 58 C40 80 52 86 60 86 C68 86 80 80 82 58 C78 70 70 74 60 74 C50 74 42 70 38 58 Z' fill='" + L.beard + "' opacity='.92'/>";
+    if (L.mustache) extra += "<path d='M50 65 C54 62 58 63 60 64 C62 63 66 62 70 65 C66 67 62 66 60 66 C58 66 54 67 50 65 Z' fill='" + h + "'/>";
+    if (L.wrinkles) extra += "<path d='M40 57 q3 2 6 0 M74 57 q3 2 6 0 M50 38 q10 -3 20 0' stroke='#b98d70' stroke-width='1' fill='none' stroke-linecap='round'/>";
+    let glasses = "";
+    if (L.glasses === "round") glasses = "<g fill='none' stroke='#4a4a4a' stroke-width='1.8'><circle cx='50' cy='52' r='7.5'/><circle cx='70' cy='52' r='7.5'/><path d='M57.5 52 h5'/></g>";
+    if (L.glasses === "square") glasses = "<g fill='none' stroke='#1f2328' stroke-width='2'><rect x='42' y='46' width='15' height='11' rx='2'/><rect x='63' y='46' width='15' height='11' rx='2'/><path d='M57 51 h6'/></g>";
+    const sweat = L.sweat ? "<path class='sweat' d='M84 40 c2 4 3 6 0 7 c-3 -1 -2 -3 0 -7 Z' fill='#7cc4f2'/>" : "";
+    return "<svg class='figure " + (cls || "") + "' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'>" +
+      "<circle class='bg' cx='60' cy='60' r='58'/>" +
+      "<g class='person'>" +
+        "<path d='M18 120 C20 96 36 88 60 88 C84 88 100 96 102 120 Z' fill='" + L.shirt + "'/>" +
+        "<path d='M48 88 L60 100 L72 88 C68 86 52 86 48 88 Z' fill='" + L.collar + "'/>" +
+        "<rect x='52' y='74' width='16' height='16' rx='6' fill='" + k + "'/>" +
+        "<g class='head'>" +
+          back +
+          "<ellipse cx='35' cy='55' rx='4' ry='6' fill='" + k + "'/><ellipse cx='85' cy='55' rx='4' ry='6' fill='" + k + "'/>" +
+          "<ellipse cx='60' cy='52' rx='25' ry='29' fill='" + k + "'/>" +
+          top + extra +
+          "<g class='brows' stroke='" + (L.style === "bald" ? "#9a9a9a" : h) + "' stroke-width='2.4' stroke-linecap='round' fill='none'>" +
+            "<path class='brow brow-l' d='M44 42 q6 -3 12 0'/><path class='brow brow-r' d='M64 42 q6 -3 12 0'/></g>" +
+          "<g class='eyes'><ellipse cx='50' cy='52' rx='3.6' ry='4' fill='#fff'/><ellipse cx='70' cy='52' rx='3.6' ry='4' fill='#fff'/>" +
+            "<g class='pupils' fill='#2a2320'><circle cx='50' cy='52.5' r='2.2'/><circle cx='70' cy='52.5' r='2.2'/></g></g>" +
+          glasses +
+          "<path d='M58 56 q2 6 4 0' stroke='#b07a5c' stroke-width='1.4' fill='none' stroke-linecap='round'/>" +
+          "<ellipse cx='45' cy='62' rx='4' ry='2.4' fill='#e88f86' opacity='.35'/><ellipse cx='75' cy='62' rx='4' ry='2.4' fill='#e88f86' opacity='.35'/>" +
+          "<path class='mouth-closed' d='M52 69 q8 6 16 0' stroke='#7a3b32' stroke-width='2.4' fill='none' stroke-linecap='round'/>" +
+          "<ellipse class='mouth-open' cx='60' cy='69' rx='5.5' ry='4.5' fill='#6b2c26'/>" +
+          sweat +
+        "</g>" +
+      "</g></svg>";
+  }
+  function figureMood(svg, mood) {
+    if (!svg) return;
+    const head = svg.querySelector(".head");
+    const mouth = svg.querySelector(".mouth-closed");
+    head.classList.remove("mood-good", "mood-bad");
+    if (mood >= 55) { head.classList.add("mood-good"); mouth.setAttribute("d", "M51 68 q9 8 18 0"); }
+    else if (mood >= 35) { mouth.setAttribute("d", "M52 70 q8 2 16 0"); }
+    else { head.classList.add("mood-bad"); mouth.setAttribute("d", "M52 72 q8 -6 16 0"); }
+  }
+
+  // ---------- Sprachausgabe ----------
+  const synth = window.speechSynthesis || null;
+  let soundOn = readSound();
+  let speakTimer = null;
+  function readSound() { try { return localStorage.getItem("verkaufstraining-ton-v1") !== "aus"; } catch (e) { return true; } }
+  function saveSound(on) { try { localStorage.setItem("verkaufstraining-ton-v1", on ? "an" : "aus"); } catch (e) {} }
+  const FEMALE = /anna|petra|helena|katja|marlene|vicki|hedda|sabine|eva|klara|amala|seraphina|louisa|katharina|female|frau/i;
+  const MALE = /markus|yannick|stefan|hans|martin|conrad|viktor|killian|florian|ralf|jonas|male|mann/i;
+  function pickVoice(female) {
+    if (!synth) return null;
+    const de = synth.getVoices().filter(v => /^de/i.test(v.lang));
+    if (!de.length) return null;
+    const want = de.find(v => (female ? FEMALE : MALE).test(v.name) && !(female ? MALE : FEMALE).test(v.name));
+    return want || de[0];
+  }
+  function speechText(t) {
+    return t.replace(/\([^)]*\)/g, " ").replace(/[„“"]/g, "").replace(/€/g, "Euro").replace(/\s+/g, " ").trim();
+  }
+  function unlockSpeech() {
+    if (!synth || !soundOn) return;
+    try { const u = new SpeechSynthesisUtterance(" "); u.volume = 0; synth.speak(u); } catch (e) {}
+  }
+  function stopSpeech() {
+    clearTimeout(speakTimer);
+    if (synth) { try { synth.cancel(); } catch (e) {} }
+    const f = currentFigure();
+    if (f) f.classList.remove("talking");
+    setSub("hört zu");
+  }
+  function currentFigure() { return document.querySelector("#avatar .figure"); }
+  function setSub(text, speaking) {
+    const n = $("stage-sub");
+    n.textContent = text;
+    n.classList.toggle("speaking", !!speaking);
+  }
+  // Lässt die Figur sprechen. Ohne Ton bewegt sich nur der Mund.
+  function say(text) {
+    return new Promise(resolve => {
+      stopSpeech();
+      const spoken = speechText(text);
+      const f = currentFigure();
+      if (!spoken || !f) { resolve(); return; }
+      f.classList.remove("thinking");
+      f.classList.add("talking");
+      setSub("spricht …", true);
+      let finished = false;
+      const end = () => {
+        if (finished) return;
+        finished = true;
+        clearTimeout(speakTimer);
+        f.classList.remove("talking");
+        setSub("hört zu");
+        resolve();
+      };
+      const est = Math.max(900, Math.min(7000, spoken.length * 62 / (sc.look.voice.rate || 1)));
+      if (synth && soundOn) {
+        try {
+          const u = new SpeechSynthesisUtterance(spoken);
+          u.lang = "de-DE";
+          const v = pickVoice(sc.look.female);
+          if (v) u.voice = v;
+          u.pitch = sc.look.voice.pitch;
+          u.rate = sc.look.voice.rate;
+          u.onend = end;
+          u.onerror = end;
+          synth.speak(u);
+          speakTimer = setTimeout(end, est * 2.2 + 1500);
+        } catch (e) { speakTimer = setTimeout(end, est); }
+      } else {
+        speakTimer = setTimeout(end, calm ? 600 : est);
+      }
+    });
+  }
+  function renderSoundBtn() {
+    const b = $("sound-btn");
+    if (!synth) { b.hidden = true; return; }
+    b.setAttribute("aria-pressed", String(soundOn));
+    b.setAttribute("aria-label", soundOn ? "Sprachausgabe ausschalten" : "Sprachausgabe einschalten");
+    b.innerHTML = soundOn
+      ? "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 9v6h4l5 4V5L8 9z'/><path d='M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11'/></svg>"
+      : "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 9v6h4l5 4V5L8 9z'/><path d='M17 9l5 6M22 9l-5 6'/></svg>";
+  }
+
   // ---------- Speicher (nur in diesem Browser) ----------
   function readBest() {
     try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch (e) { return {}; }
@@ -1095,6 +1305,7 @@ details[open] summary { margin-bottom: 10px; }
   // ---------- Startseite ----------
   function showHome() {
     runCounter++;
+    stopSpeech();
     sc = null; state = { run: -1 };
     playEl.hidden = true; homeEl.hidden = false; homeBtn.hidden = true;
     subline.textContent = "Verkaufsgespräche üben · 8 Phasen · " + SCENARIOS.length + " Szenarien";
@@ -1138,7 +1349,7 @@ details[open] summary { margin-bottom: 10px; }
       const b = best[s.id];
       c.innerHTML =
         "<div class=\"top\"><span class=\"tag\">" + s.tag + "</span>" + dots(s.level) + "</div>" +
-        "<h3>" + s.title + "</h3>" +
+        "<div class=\"who-row\"><span class=\"mini\">" + figureSVG(s.look) + "</span><h3>" + s.title + "</h3></div>" +
         "<p>" + s.teaser + "</p>" +
         "<div class=\"foot\"><span class=\"shopname\">" + s.shop + "</span>" +
         (b ? "<span class=\"best\">Bestwert: " + b.points + "/" + MAX + " · Note " + b.note + "</span>"
@@ -1158,10 +1369,17 @@ details[open] summary { margin-bottom: 10px; }
     homeEl.hidden = true; playEl.hidden = false; homeBtn.hidden = false;
     subline.textContent = s.shop + " · " + s.tag + " · " + (mode === "uebung" ? "Übungsmodus" : "Prüfungsmodus");
     chat.innerHTML = "";
-    renderPhases(); renderMood();
+    stopSpeech();
+    $("avatar").innerHTML = figureSVG(s.look, "hello");
+    $("stage-name").textContent = s.who;
+    renderPhases(); renderMood(); renderSoundBtn();
 
     const box = el("section", "intro");
-    box.appendChild(el("h2", null, s.title));
+    const wr = el("div", "who-row");
+    wr.appendChild(el("span", "big", figureSVG(s.look)));
+    wr.appendChild(el("h2", null, s.title));
+    box.appendChild(wr);
+    figureMood(box.querySelector(".figure"), s.startMood);
     box.appendChild(el("p", null, s.teaser));
     const dl = el("dl", "profile");
     s.profile.forEach(([k, v]) => { dl.appendChild(el("dt", null, k)); dl.appendChild(el("dd", null, v)); });
@@ -1176,7 +1394,7 @@ details[open] summary { margin-bottom: 10px; }
     const go = el("button", "btn", "Gespräch starten");
     go.type = "button";
     go.id = "start-btn";
-    go.addEventListener("click", () => { chat.innerHTML = ""; showStep(); });
+    go.addEventListener("click", () => { unlockSpeech(); chat.innerHTML = ""; showStep(); });
     dock.appendChild(go);
     window.scrollTo({ top: 0 });
   }
@@ -1210,6 +1428,7 @@ details[open] summary { margin-bottom: 10px; }
     else { word = "verärgert"; color = "var(--bad)"; }
     moodFill.style.backgroundColor = color;
     moodFace.textContent = word;
+    figureMood(currentFigure(), m);
   }
 
   function addNote(html) { chat.appendChild(el("p", "note", html)); }
@@ -1271,7 +1490,7 @@ details[open] summary { margin-bottom: 10px; }
     const s = sc.steps[state.step];
     renderPhases();
     addNote((s.clock ? "<span class=\"clock\">" + s.clock + " Uhr</span> · " : "") + "<strong>" + s.phase + ".</strong> " + s.situation);
-    if (s.customer) addMsg("customer", s.customer);
+    if (s.customer) { addMsg("customer", s.customer); say(s.customer); }
 
     dock.innerHTML = "";
     dock.appendChild(el("div", "ask", s.ask));
@@ -1319,11 +1538,17 @@ details[open] summary { margin-bottom: 10px; }
     await wait(300);
     if (run !== state.run) return;
     const typing = addTyping();
+    stopSpeech();
+    const fig = currentFigure();
+    if (fig) fig.classList.add("thinking");
+    setSub("überlegt …");
     scrollDown();
     await wait(800 + Math.min(900, opt.r.length * 8));
     if (run !== state.run) return;
     typing.remove();
+    if (fig) fig.classList.remove("thinking");
     addMsg("customer", opt.r);
+    say(opt.r);
     renderMood();
     showDelta(state.mood - before);
     if (mode === "uebung") { await wait(350); if (run !== state.run) return; chat.appendChild(feedbackBox(opt)); }
@@ -1334,7 +1559,15 @@ details[open] summary { margin-bottom: 10px; }
     const left = !done && state.mood <= 0;
     dock.innerHTML = "";
     if (left) {
-      addMsg("customer", "Wissen Sie was … ich überlege mir das noch mal. Auf Wiedersehen.");
+      const bye = "Wissen Sie was … ich überlege mir das noch mal. Auf Wiedersehen.";
+      addMsg("customer", bye);
+      const run2 = state.run;
+      say(bye).then(() => {
+        if (run2 !== state.run) return;
+        const f = currentFigure();
+        if (f) f.classList.add("gone");
+        setSub("hat den Laden verlassen");
+      });
       addNote("<strong>Die Kundschaft verlässt das Geschäft.</strong> Die Stimmung ist auf dem Tiefpunkt.");
       state.left = true;
     }
@@ -1432,6 +1665,13 @@ details[open] summary { margin-bottom: 10px; }
   }
 
   homeBtn.addEventListener("click", showHome);
+  $("sound-btn").addEventListener("click", () => {
+    soundOn = !soundOn;
+    saveSound(soundOn);
+    if (!soundOn) stopSpeech(); else unlockSpeech();
+    renderSoundBtn();
+  });
+  if (synth && synth.onvoiceschanged !== undefined) synth.onvoiceschanged = () => {};
   showHome();
 })();
 </script>
