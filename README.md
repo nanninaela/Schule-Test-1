@@ -35,6 +35,11 @@ Die Bestwerte pro Szenario werden nur im Browser der jeweiligen Person gespeiche
 - `verkaufsgespraech.html`: die App (Quelle, wird als Claude-Artifact veröffentlicht)
 - `index.html`: eigenständige Version zum Öffnen im Browser oder für GitHub Pages, erzeugt mit `./build.sh`
 
+## Auf die iPads bringen (AirDrop, ohne Apple-Konto)
+
+- **Empfohlen: den Link per AirDrop teilen.** Ein per AirDrop empfangener Link öffnet sich direkt in Safari. Dafür braucht es weder ein Apple-Konto noch den App Store, nur Internet.
+- **Die Datei `index.html` per AirDrop teilen:** Sie landet in der Dateien-App. Deren Vorschau führt oft kein JavaScript aus. Dann erscheint ein Hinweis, die Übung über den Link zu öffnen. Vorher an einem Schüler-iPad testen.
+
 ## Neue Szenarien ergänzen
 
 Szenarien stehen im Array `SCENARIOS` in `verkaufsgespraech.html`. Jedes Szenario braucht 8 Schritte in der Reihenfolge der Phasen. Jeder Schritt hat drei Antworten mit `s` = 2, 1 und 0 Punkten. Danach `./build.sh` ausführen.
