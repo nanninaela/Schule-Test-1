@@ -48,6 +48,8 @@ Die Bestwerte pro Szenario werden nur im Browser der jeweiligen Person gespeiche
 
 `praesentation/Verkaufsgespraech_Vorbereitung.pptx` (15 Folien) bereitet die Klasse auf die Übungen vor. Sie enthält Lernziele, die 8 Phasen mit Methoden und Beispielen aus den Szenarien, die Kundentypen, eine Anleitung zur App und einen Arbeitsauftrag. Die Sprechernotizen enthalten Hinweise für die Lehrkraft. Erzeugt wird sie mit `praesentation/build-deck.js`.
 
+`praesentation/Einfuehrung_Phase1_Kontaktaufnahme.pptx` (10 Folien) ist eine kürzere Stunde zur allgemeinen Einführung und zur Phase 1 (Kontaktaufnahme). Am Ende steht eine Partnerarbeit über den letzten eigenen Einkauf. Erzeugt wird sie mit `praesentation/build-deck-phase1.js`.
+
 ## Neue Szenarien ergänzen
 
 Szenarien stehen im Array `SCENARIOS` in `verkaufsgespraech.html`. Jedes Szenario braucht 8 Schritte in der Reihenfolge der Phasen. Jeder Schritt hat drei Antworten mit `s` = 2, 1 und 0 Punkten. Danach `./build.sh` ausführen.
