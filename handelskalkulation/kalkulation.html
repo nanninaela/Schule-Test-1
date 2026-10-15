@@ -160,7 +160,7 @@ button, select, input { font: inherit; color: inherit; }
 .sheet-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; padding-bottom: 8px; border-bottom: 1px solid var(--line); margin-bottom: 4px; }
 .row { display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto; gap: 4px 10px; align-items: center; padding: 7px 0; }
 .row .op { font-family: var(--f-mono); font-weight: 600; font-size: 1.1rem; color: var(--muted); text-align: center; }
-.row .lbl { min-width: 0; hyphens: auto; overflow-wrap: anywhere; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.row .lbl { min-width: 0; hyphens: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
 .row.sum { border-top: 1.5px solid var(--ink); }
 .row.sum .lbl { font-weight: 700; }
 .row.final { border-bottom: 4px double var(--ink); }
@@ -185,7 +185,34 @@ button, select, input { font: inherit; color: inherit; }
 .binfo > div { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 6px; min-width: 0; }
 .binfo p { font-size: .93rem; }
 .pick-hint { margin-top: 18px; border: 1.5px dashed var(--accent); border-radius: 12px; padding: 12px 14px; color: var(--accent); font-weight: 700; }
-@media (max-width: 420px) { .field input { width: 6.6rem; } .row { gap: 4px 6px; } }
+/* Smartphone: Beschriftung über dem Eingabefeld, Knöpfe in voller Breite */
+@media (max-width: 520px) {
+  .wrap { padding-block: 18px 40px; }
+  .setup { margin-top: 18px; }
+  .setup .grp { width: 100%; }
+  .seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
+  .seg button { padding: .45rem .3rem; font-size: .95rem; }
+  .levels, .info { margin-top: 22px; }
+  .tag { padding: 16px 16px 16px 40px; }
+  .tag::before { left: 13px; }
+  .tag .foot .btn, .actions .btn, .nav .btn { width: 100%; }
+  .offer, .sheet, .panel { padding: 16px; }
+  .facts div { padding: 5px 0; }
+  .row { grid-template-columns: 1.4rem minmax(0, 1fr); grid-template-areas: "op lbl" "op field"; gap: 4px 8px; padding: 9px 0; }
+  .row .op { grid-area: op; align-self: start; }
+  .row .lbl { grid-area: lbl; }
+  .row .field, .row .val { grid-area: field; }
+  .row.given .val { padding-right: 0; }
+  .field { width: 100%; }
+  .field input { flex: 1; width: auto; min-width: 0; font-size: 1.1rem; }
+  .help { grid-column: 2; }
+  .nav { flex-direction: column-reverse; }
+  .score { padding: 18px; }
+  .score .big { font-size: 2.8rem; }
+  details.res > summary { padding: 12px 14px; }
+  .res-body { padding: 0 14px 14px; }
+  .login-row .btn { width: 100%; }
+}
 
 /* ---------- Auswertung ---------- */
 .score { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px 26px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 22px; box-shadow: var(--shadow); }
@@ -253,7 +280,7 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
   const TOL = 2; // Rundungstoleranz in Cent
 
   const nf = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const fmt = c => nf.format(c / 100) + " €";
+  const fmt = c => nf.format(c / 100) + "\u00a0€";
   const esc = s => String(s).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
   const pick = a => a[Math.floor(Math.random() * a.length)];
   const randInt = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
@@ -428,15 +455,15 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
   function taskFacts(t) {
     const f = [[BASE_NAME[t.start] + " " + t.product.per, fmt(t.startValue)]];
     t.steps.forEach(s => {
-      if (s.key === "rabatt") f.push(["Liefererrabatt", s.rate + " %"]);
+      if (s.key === "rabatt") f.push(["Liefererrabatt", s.rate + "\u00a0%"]);
       if (s.key === "skonto") f.push(["Liefererskonto", s.rate + " % bei Zahlung in 10 Tagen"]);
       if (s.key === "bezug") {
         if (s.total) { f.push(["Bestellmenge", s.qty + " " + t.product.many]); f.push(["Fracht und Verpackung", fmt(s.total) + " für die ganze Lieferung"]); }
         else f.push(["Fracht", fmt(s.amount) + " " + t.product.per]);
       }
-      if (s.key === "hk") f.push(["Handlungskostenzuschlag", s.rate + " %"]);
-      if (s.key === "gewinn") f.push(["Gewinnzuschlag", s.rate + " %"]);
-      if (s.key === "ust") f.push(["Umsatzsteuer", t.ustSelect ? "selbst bestimmen" : s.rate + " %"]);
+      if (s.key === "hk") f.push(["Handlungskostenzuschlag", s.rate + "\u00a0%"]);
+      if (s.key === "gewinn") f.push(["Gewinnzuschlag", s.rate + "\u00a0%"]);
+      if (s.key === "ust") f.push(["Umsatzsteuer", t.ustSelect ? "selbst bestimmen" : s.rate + "\u00a0%"]);
     });
     return f;
   }
@@ -801,6 +828,7 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
     const practice = catList.length ? catList.map(([c, n]) => `<div class="panel"><h3><span>${CATS[c].t}</span><span class="chip bad">${n}×</span></h3><p>${CATS[c].d}</p><div class="ex">${esc(CATS[c].ex)}</div></div>`).join("")
       : `<div class="panel"><h3>Keine Fehler</h3><p>Alles richtig gerechnet. Sehr gut!</p></div>`;
 
+    const firstErr = R.per.findIndex(r => r.pts < r.max);
     const tasks = R.per.map((r, i) => {
       const t = S.tasks[i];
       const errs = r.max - r.pts;
@@ -813,7 +841,7 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
         const hint = row.hint && row.status !== "folge" ? `<div class="hint">${row.cat ? `<b>${CATS[row.cat].t}</b>` : ""}${row.hint}</div>` : "";
         return `<div class="rr${row.sum ? " sum" : ""}"><span class="o">${row.op || ""}</span><span class="l">${row.label}</span><span class="y${yc}">${yourTxt}</span><span class="c">${corrTxt}</span><span class="s">${badge}</span>${hint}</div>`;
       }).join("");
-      return `<details class="res"${errs ? " open" : ""}>
+      return `<details class="res"${i === firstErr ? " open" : ""}>
         <summary><span class="t">Aufgabe ${i + 1} · ${esc(t.product.name)}</span><span class="chip ${errs ? "bad" : "good"}">${r.pts} von ${r.max} Punkten</span></summary>
         <div class="res-body">
           <p class="muted" style="font-size:.92rem">${taskFacts(t).map(([k, v]) => `${k}: ${v}`).join(" · ")}</p>

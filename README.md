@@ -76,6 +76,7 @@ Online-Übung zur Vorwärtskalkulation für Verkäuferinnen und Verkäufer im 2.
 - Die Auswertung zeigt jede Zeile mit Eingabe und richtigem Wert. Bei Fehlern steht ein Hinweis, was falsch gemacht wurde (z. B. falsche Bezugsgröße, falsches Rechenzeichen, im Hundert statt vom Hundert gerechnet, falscher Steuersatz, Komma verrutscht, Lieferungskosten nicht aufgeteilt). Darüber steht „Das solltest du üben“ mit Erklärung und Beispiel.
 - Die ganze Klasse kann gleichzeitig üben. Die Übung läuft vollständig im Browser des jeweiligen Geräts; es werden keine Daten an einen Server geschickt oder mit anderen geteilt. Niemand sieht die Ergebnisse der anderen.
 - Der Fortschritt wird pro Vorname nur auf dem Gerät gespeichert. Teilen sich mehrere Personen ein Gerät, meldet sich jede am Ende über „Abmelden“ ab; die nächste Person sieht dann nur ihren eigenen Stand.
+- Die Seite ist für Smartphones angepasst: Auf schmalen Bildschirmen steht jede Beschriftung über ihrem Eingabefeld, die Knöpfe sind so breit wie der Bildschirm, und in der Auswertung ist nur die erste Aufgabe mit Fehlern aufgeklappt.
 - **Für die Lehrkraft:** Mit `#lehrkraft` am Ende des Links sind alle Stufen offen.
 
 ## Dateien
