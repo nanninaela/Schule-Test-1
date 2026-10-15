@@ -53,3 +53,28 @@ Die Bestwerte pro Szenario werden nur im Browser der jeweiligen Person gespeiche
 ## Neue Szenarien ergänzen
 
 Szenarien stehen im Array `SCENARIOS` in `verkaufsgespraech.html`. Jedes Szenario braucht 8 Schritte in der Reihenfolge der Phasen. Jeder Schritt hat drei Antworten mit `s` = 2, 1 und 0 Punkten. Danach `./build.sh` ausführen.
+
+# Kalkulationstrainer Einzelhandel (Handelskalkulation)
+
+Online-Übung zur Vorwärtskalkulation für Verkäuferinnen und Verkäufer im 2. Ausbildungsjahr (NRW). Die Waren stammen aus den Ausbildungsbetrieben Lebensmittel (Frischemarkt Kortmann) und Bekleidung (Modehaus Brüggemann). Auf der Startseite wählt man Lebensmittel, Bekleidung oder Gemischt.
+
+## Stufen
+
+| Stufe | Inhalt | Aufgaben je Runde |
+|---|---|---|
+| 1 Einstieg | Bezugspreis → Handlungskosten → Gewinn → Umsatzsteuer, glatte Beträge, Rechenweg-Hilfe | 4 |
+| 2 Einkauf | Listeneinkaufspreis → Rabatt → Skonto → Bezugskosten, Rechenweg-Hilfe | 4 |
+| 3 Gesamt | komplette Vorwärtskalkulation bis zum Bruttoverkaufspreis | 3 |
+| 4 Profi | Bezugskosten der Lieferung aufteilen, Steuersatz (7 %/19 %) selbst bestimmen, Schwellenpreis ,99 | 3 |
+
+- Die Aufgaben werden bei jeder Runde mit neuen Zahlen erzeugt.
+- Eine Stufe ist ab 80 % bestanden. Erst dann wird die nächste freigeschaltet.
+- Folgefehler werden nicht doppelt bestraft.
+- Die Auswertung zeigt jede Zeile mit Eingabe und richtigem Wert. Bei Fehlern steht ein Hinweis, was falsch gemacht wurde (z. B. falsche Bezugsgröße, falsches Rechenzeichen, im Hundert statt vom Hundert gerechnet, falscher Steuersatz, Komma verrutscht, Lieferungskosten nicht aufgeteilt). Darüber steht „Das solltest du üben“ mit Erklärung und Beispiel.
+- Der Fortschritt wird nur im Browser des Geräts gespeichert.
+- **Für die Lehrkraft:** Mit `#lehrkraft` am Ende des Links sind alle Stufen offen.
+
+## Dateien
+
+- `handelskalkulation/kalkulation.html`: die App (Quelle, Claude-Artifact)
+- `handelskalkulation/index.html`: eigenständige Version, erzeugt mit `./build.sh`
