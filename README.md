@@ -65,3 +65,5 @@ Szenarien stehen im Array `SCENARIOS` in `verkaufsgespraech.html`. Jedes Szenari
 Jede Aufgabe hat einen Tipp und zwei Versuche (2 Punkte beim ersten, 1 Punkt beim zweiten Versuch). Richtige Sätze werden vorgelesen. Am Ende gibt es eine Übersicht aller Sätze.
 
 **QR-Code:** `wenn-dann-qr.png` (zum Drucken) und `wenn-dann-qr.html` (zum Zeigen am Beamer). Er führt zu `https://nanninaela.github.io/Schule-Test-1/wenn-dann.html`. Dafür muss GitHub Pages eingeschaltet sein: im Repository unter **Settings → Pages → Build and deployment** „Deploy from a branch“ wählen, den Branch mit der Datei auswählen, Ordner `/ (root)`, speichern.
+
+**Nur Browser, keine App:** Die Übung läuft komplett im Browser des Handys (Safari, Chrome, Samsung Internet). Zum Scannen reicht die normale Kamera: Bei iPhones und den meisten Android-Handys erscheint ein Link, wenn man die Kamera auf den Code hält. Klappt das nicht, kann man die Adresse unter dem QR-Code von Hand in den Browser eingeben. Es gibt keine Anmeldung und nichts zu installieren. Die Vorlesefunktion nutzt die Stimme des Handys; fehlt sie, funktioniert die Übung trotzdem.
