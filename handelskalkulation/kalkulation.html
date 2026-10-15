@@ -218,7 +218,7 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
   .rr .l { grid-column: 2 / 3; }
   .rr .s { grid-column: 3 / 4; grid-row: 1; }
   .rr .y, .rr .c { grid-column: 2 / -1; text-align: left; font-size: .9rem; }
-  .rr .y::before { content: "Deine Eingabe: "; font-family: var(--f-body); color: var(--muted); }
+  .rr .y::before { content: "Ihre Eingabe: "; font-family: var(--f-body); color: var(--muted); }
   .rr .c::before { content: "Richtig: "; font-family: var(--f-body); color: var(--muted); }
 }
 .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 26px; }
@@ -320,17 +320,17 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
   };
 
   const CATS = {
-    leer: { t: "Alle Felder ausfüllen", d: "Leere Felder zählen als Fehler. Rechne jede Zeile, auch wenn du unsicher bist. Rechnest du mit einem falschen Wert richtig weiter, gilt das als Folgefehler und kostet keinen weiteren Punkt.", ex: "Lieber eine Zahl eintragen als nichts." },
-    prozent: { t: "Prozentwert berechnen", d: "Prozentwert = Grundwert × Prozentsatz ÷ 100. Achte darauf, wo das Komma steht, und trage den Betrag in Euro ein, nicht den Prozentsatz.", ex: "15 % von 40,00 € = 40,00 × 15 ÷ 100 = 6,00 €" },
+    leer: { t: "Alle Felder ausfüllen", d: "Leere Felder zählen als Fehler. Rechnen Sie jede Zeile, auch wenn Sie unsicher sind. Rechnen Sie mit einem falschen Wert richtig weiter, gilt das als Folgefehler und kostet keinen weiteren Punkt.", ex: "Lieber eine Zahl eintragen als gar nichts." },
+    prozent: { t: "Prozentwert berechnen", d: "Prozentwert = Grundwert × Prozentsatz ÷ 100. Achten Sie darauf, wo das Komma steht, und tragen Sie den Betrag in Euro ein, nicht den Prozentsatz.", ex: "15 % von 40,00 € = 40,00 × 15 ÷ 100 = 6,00 €" },
     basis: { t: "Die richtige Bezugsgröße", d: "Jeder Prozentsatz bezieht sich auf das Zwischenergebnis direkt darüber: Rabatt auf den Listeneinkaufspreis, Skonto auf den Zieleinkaufspreis, Handlungskosten auf den Bezugspreis, Gewinn auf den Selbstkostenpreis, Umsatzsteuer auf den Nettoverkaufspreis.", ex: "Skonto 2 % vom Zieleinkaufspreis, nicht vom Listeneinkaufspreis" },
-    vorzeichen: { t: "Plus oder minus?", d: "Im Einkauf wird die Ware billiger: Rabatt und Skonto ziehst du ab. Danach wird sie teurer: Bezugskosten, Handlungskosten, Gewinn und Umsatzsteuer rechnest du dazu.", ex: "− Rabatt  − Skonto  + Bezugskosten  + Handlungskosten  + Gewinn  + USt" },
-    imHundert: { t: "Vom Hundert rechnen", d: "In der Vorwärtskalkulation ist der Wert darüber immer 100 %. Rechne also Grundwert × p ÷ 100 und nicht ÷ (100 + p). Das Rechnen im Hundert brauchst du erst bei der Rückwärtskalkulation.", ex: "USt 19 % von 50,00 € = 50,00 × 19 ÷ 100 = 9,50 €" },
+    vorzeichen: { t: "Plus oder minus?", d: "Im Einkauf wird die Ware billiger: Rabatt und Skonto ziehen Sie ab. Danach wird sie teurer: Bezugskosten, Handlungskosten, Gewinn und Umsatzsteuer rechnen Sie dazu.", ex: "− Rabatt  − Skonto  + Bezugskosten  + Handlungskosten  + Gewinn  + USt" },
+    imHundert: { t: "Vom Hundert rechnen", d: "In der Vorwärtskalkulation ist der Wert darüber immer 100 %. Rechnen Sie also Grundwert × p ÷ 100 und nicht ÷ (100 + p). Das Rechnen im Hundert brauchen Sie erst bei der Rückwärtskalkulation.", ex: "USt 19 % von 50,00 € = 50,00 × 19 ÷ 100 = 9,50 €" },
     ust: { t: "Umsatzsteuersätze", d: "Lebensmittel haben den ermäßigten Satz von 7 %. Getränke wie Mineralwasser, Saft oder Wein haben 19 % (Ausnahme: Milch). Bekleidung und Schuhe haben immer 19 %.", ex: "Käse 7 %  ·  Orangensaft 19 %  ·  Jeans 19 %" },
-    runden: { t: "Auf Cent runden", d: "Rechne genau und runde jedes Ergebnis auf zwei Nachkommastellen. Ist die dritte Stelle 5 oder größer, rundest du auf.", ex: "12,345 € → 12,35 €   ·   12,344 € → 12,34 €" },
-    rechnen: { t: "Zwischenergebnisse genau rechnen", d: "Kontrolliere Addition und Subtraktion. Mach vorher einen Überschlag: Passt das Ergebnis ungefähr?", ex: "34,12 + 15,35 = 49,47  (Überschlag: 34 + 15 = 49)" },
+    runden: { t: "Auf Cent runden", d: "Rechnen Sie genau und runden Sie jedes Ergebnis auf zwei Nachkommastellen. Ist die dritte Stelle 5 oder größer, wird aufgerundet.", ex: "12,345 € → 12,35 €   ·   12,344 € → 12,34 €" },
+    rechnen: { t: "Zwischenergebnisse genau rechnen", d: "Kontrollieren Sie Addition und Subtraktion. Machen Sie vorher einen Überschlag: Passt das Ergebnis ungefähr?", ex: "34,12 + 15,35 = 49,47  (Überschlag: 34 + 15 = 49)" },
     zeile: { t: "Betrag und Zwischenergebnis trennen", d: "Jede Rechenstufe hat zwei Zeilen: erst den Euro-Betrag (zum Beispiel den Rabatt), dann nach dem Summenstrich das neue Zwischenergebnis (zum Beispiel den Zieleinkaufspreis).", ex: "− Rabatt 6,00 €  /  = Zieleinkaufspreis 34,00 €" },
-    bezugskosten: { t: "Bezugskosten pro Stück", d: "Gelten Fracht oder Verpackung für die ganze Lieferung, teilst du sie durch die Bestellmenge. Erst dann kommen sie in die Kalkulation je Stück.", ex: "36,00 € ÷ 48 Stück = 0,75 € je Stück" },
-    schwelle: { t: "Schwellenpreise", d: "Der Ladenpreis endet auf ,99 und liegt nie unter dem kalkulierten Bruttoverkaufspreis. Sonst fehlt dir Gewinn.", ex: "23,41 € → 23,99 €   ·   23,99 € → 23,99 €" }
+    bezugskosten: { t: "Bezugskosten pro Stück", d: "Gelten Fracht oder Verpackung für die ganze Lieferung, teilen Sie sie durch die Bestellmenge. Erst dann kommen sie in die Kalkulation je Stück.", ex: "36,00 € ÷ 48 Stück = 0,75 € je Stück" },
+    schwelle: { t: "Schwellenpreise", d: "Der Ladenpreis endet auf ,99 und liegt nie unter dem kalkulierten Bruttoverkaufspreis. Sonst fehlt Gewinn.", ex: "23,41 € → 23,99 €   ·   23,99 € → 23,99 €" }
   };
 
   /* ================= Aufgaben erzeugen ================= */
@@ -412,9 +412,9 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
   }
   function taskGoal(t) {
     const p = t.product;
-    if (t.level === 2) return `Berechne den Bezugspreis ${p.per}.`;
-    if (t.schwelle) return `Kalkuliere den Bruttoverkaufspreis ${p.per} und lege den Ladenpreis fest.`;
-    return `Berechne den Bruttoverkaufspreis ${p.per}.`;
+    if (t.level === 2) return `Berechnen Sie den Bezugspreis ${p.per}.`;
+    if (t.schwelle) return `Kalkulieren Sie den Bruttoverkaufspreis ${p.per} und legen Sie den Ladenpreis fest.`;
+    return `Berechnen Sie den Bruttoverkaufspreis ${p.per}.`;
   }
   function taskFacts(t) {
     const f = [[BASE_NAME[t.start] + " " + t.product.per, fmt(t.startValue)]];
@@ -438,37 +438,37 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
     const { s, D, A, R, B, rate, t, labels, i } = c;
     if (near(a, R) && !near(A, R)) return { cat: "zeile", hint: `Hier gehört nur der Betrag hin. ${fmt(R)} ist schon das Zwischenergebnis (${short(D.result)}).` };
     if (D.type === "fixed") {
-      if (s.total && near(a, s.total)) return { cat: "bezugskosten", hint: `Du hast die Kosten der ganzen Lieferung eingesetzt. Je Einheit: ${fmt(s.total)} ÷ ${s.qty} = ${fmt(A)}.` };
+      if (s.total && near(a, s.total)) return { cat: "bezugskosten", hint: `Sie haben die Kosten der ganzen Lieferung eingesetzt. Je Einheit: ${fmt(s.total)} ÷ ${s.qty} = ${fmt(A)}.` };
       if (s.total) return { cat: "bezugskosten", hint: `Bezugskosten je Einheit: ${fmt(s.total)} ÷ ${s.qty} = ${fmt(A)}.` };
       return { cat: "bezugskosten", hint: `Die Bezugskosten stehen in der Aufgabe: ${fmt(A)} ${t.product.per}.` };
     }
-    if (a === rate * 100) return { cat: "prozent", hint: `Du hast den Prozentsatz eingetragen. Gesucht ist der Betrag in Euro: ${fmt(B)} × ${rate} ÷ 100 = ${fmt(A)}.` };
-    if (D.op > 0 && near(a, Math.round(B * rate / (100 + rate)))) return { cat: "imHundert", hint: `Du hast im Hundert gerechnet (÷ ${100 + rate}). Vorwärts gilt: ${short(labels[i])} = 100 %, also ${fmt(B)} × ${rate} ÷ 100 = ${fmt(A)}.` };
-    if (D.op < 0 && near(a, Math.round(B * rate / (100 - rate)))) return { cat: "imHundert", hint: `Du hast auf Hundert gerechnet (÷ ${100 - rate}). Vorwärts gilt: ${short(labels[i])} = 100 %, also ${fmt(B)} × ${rate} ÷ 100 = ${fmt(A)}.` };
+    if (a === rate * 100) return { cat: "prozent", hint: `Sie haben den Prozentsatz eingetragen. Gesucht ist der Betrag in Euro: ${fmt(B)} × ${rate} ÷ 100 = ${fmt(A)}.` };
+    if (D.op > 0 && near(a, Math.round(B * rate / (100 + rate)))) return { cat: "imHundert", hint: `Sie haben im Hundert gerechnet (÷ ${100 + rate}). Vorwärts gilt: ${short(labels[i])} = 100 %, also ${fmt(B)} × ${rate} ÷ 100 = ${fmt(A)}.` };
+    if (D.op < 0 && near(a, Math.round(B * rate / (100 - rate)))) return { cat: "imHundert", hint: `Sie haben auf Hundert gerechnet (÷ ${100 - rate}). Vorwärts gilt: ${short(labels[i])} = 100 %, also ${fmt(B)} × ${rate} ÷ 100 = ${fmt(A)}.` };
     if (s.key === "ust") {
       const other = s.rate === 19 ? 7 : 19;
-      if (near(a, pct(B, other))) return { cat: "ust", hint: `Du hast mit ${other} % gerechnet. Für ${t.product.name} gilt ${s.rate} %: ${fmt(B)} × ${s.rate} ÷ 100 = ${fmt(A)}.` };
+      if (near(a, pct(B, other))) return { cat: "ust", hint: `Sie haben mit ${other} % gerechnet. Für ${t.product.name} gilt ${s.rate} %: ${fmt(B)} × ${s.rate} ÷ 100 = ${fmt(A)}.` };
     }
     for (let j = 0; j < t.sol.vals.length; j++) {
       if (j === i) continue;
       const cand = pct(t.sol.vals[j], rate);
-      if (near(a, cand) && !near(cand, A)) return { cat: "basis", hint: `Du hast ${rate} % vom ${short(labels[j])} berechnet. Grundwert ist der ${short(labels[i])}: ${fmt(B)} × ${rate} ÷ 100 = ${fmt(A)}.` };
+      if (near(a, cand) && !near(cand, A)) return { cat: "basis", hint: `Sie haben ${rate} % vom ${short(labels[j])} berechnet. Grundwert ist der ${short(labels[i])}: ${fmt(B)} × ${rate} ÷ 100 = ${fmt(A)}.` };
     }
     for (const f of [10, 100]) {
       if (near(a, A * f, f) || near(a * f, A, f)) return { cat: "prozent", hint: `Das Komma ist verrutscht. Richtig: ${fmt(B)} × ${rate} ÷ 100 = ${fmt(A)}.` };
     }
-    if (near(a, A, 10)) return { cat: "runden", hint: `Knapp daneben. Rechne genau und runde auf Cent: ${fmt(B)} × ${rate} ÷ 100 = ${fmt(A)}.` };
-    return { cat: "prozent", hint: `So rechnest du: ${short(labels[i])} ${fmt(B)} × ${rate} ÷ 100 = ${fmt(A)}.` };
+    if (near(a, A, 10)) return { cat: "runden", hint: `Knapp daneben. Rechnen Sie genau und runden Sie auf Cent: ${fmt(B)} × ${rate} ÷ 100 = ${fmt(A)}.` };
+    return { cat: "prozent", hint: `So rechnen Sie: ${short(labels[i])} ${fmt(B)} × ${rate} ÷ 100 = ${fmt(A)}.` };
   }
 
   function diagResult(x, c) {
     const { P, aUsed, D, R, own } = c;
     const sign = D.op < 0 ? "−" : "+";
-    if (near(x, P - D.op * aUsed) && aUsed > TOL) return { cat: "vorzeichen", hint: D.op < 0 ? `Den ${D.amount === "Liefererskonto" ? "Skonto" : "Rabatt"} ziehst du ab: ${fmt(P)} − ${fmt(aUsed)} = ${fmt(own)}.` : `${D.amount === "Gewinn" ? "Den Gewinn" : "Die " + D.amount} rechnest du dazu: ${fmt(P)} + ${fmt(aUsed)} = ${fmt(own)}.` };
-    if (near(x, P)) return { cat: "zeile", hint: `Du hast den Wert von oben übernommen, ohne den Betrag zu verrechnen: ${fmt(P)} ${sign} ${fmt(aUsed)} = ${fmt(own)}.` };
+    if (near(x, P - D.op * aUsed) && aUsed > TOL) return { cat: "vorzeichen", hint: D.op < 0 ? `Den ${D.amount === "Liefererskonto" ? "Skonto" : "Rabatt"} ziehen Sie ab: ${fmt(P)} − ${fmt(aUsed)} = ${fmt(own)}.` : `${D.amount === "Gewinn" ? "Den Gewinn" : "Die " + D.amount} rechnen Sie dazu: ${fmt(P)} + ${fmt(aUsed)} = ${fmt(own)}.` };
+    if (near(x, P)) return { cat: "zeile", hint: `Sie haben den Wert von oben übernommen, ohne den Betrag zu verrechnen: ${fmt(P)} ${sign} ${fmt(aUsed)} = ${fmt(own)}.` };
     if (near(x, aUsed)) return { cat: "zeile", hint: `Das ist der Betrag aus der Zeile darüber. Gesucht ist das neue Zwischenergebnis: ${fmt(P)} ${sign} ${fmt(aUsed)} = ${fmt(own)}.` };
     if (near(x, own, 10) || near(x, R, 10)) return { cat: "runden", hint: `Knapp daneben: ${fmt(P)} ${sign} ${fmt(aUsed)} = ${fmt(own)}.` };
-    return { cat: "rechnen", hint: `Rechne nach: ${fmt(P)} ${sign} ${fmt(aUsed)} = ${fmt(own)}.` };
+    return { cat: "rechnen", hint: `Rechnen Sie nach: ${fmt(P)} ${sign} ${fmt(aUsed)} = ${fmt(own)}.` };
   }
 
   function ustHint(t, rate) {
@@ -496,7 +496,7 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
       if (s.key === "ust" && t.ustSelect) {
         const chosen = parseInt(ans.ust, 10);
         const row = { label: "Steuersatz", op: "", text: true, your: chosen ? chosen + " %" : "–", correct: s.rate + " %" };
-        if (!chosen) { row.status = "empty"; row.cat = "leer"; row.hint = "Du hast keinen Steuersatz gewählt."; }
+        if (!chosen) { row.status = "empty"; row.cat = "leer"; row.hint = "Sie haben keinen Steuersatz gewählt."; }
         else if (chosen === s.rate) row.status = "ok";
         else { row.status = "wrong"; row.cat = "ust"; row.hint = ustHint(t, s.rate); rate = chosen; }
         add(row);
@@ -506,9 +506,9 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
       const ownA = D.type === "fixed" ? A : pct(P, rate);
       const ar = { label: D.amount + (D.type === "rate" ? ` (${s.key === "ust" && t.ustSelect ? s.rate : rate} %)` : ""), op: D.op < 0 ? "−" : "+", your: a, correct: A };
       if (a === null) { ar.status = "empty"; ar.cat = "leer"; ar.hint = "Dieses Feld ist leer."; }
-      else if (Number.isNaN(a)) { ar.status = "wrong"; ar.cat = "leer"; ar.hint = "Das ist keine gültige Zahl. Schreibe zum Beispiel 12,50."; }
+      else if (Number.isNaN(a)) { ar.status = "wrong"; ar.cat = "leer"; ar.hint = "Das ist keine gültige Zahl. Schreiben Sie zum Beispiel 12,50."; }
       else if (near(a, A)) ar.status = "ok";
-      else if (near(a, ownA)) { ar.status = "folge"; ar.hint = `Richtig gerechnet mit deinem Wert darüber (${fmt(P)}). Der Fehler liegt weiter oben.`; }
+      else if (near(a, ownA)) { ar.status = "folge"; ar.hint = `Richtig gerechnet mit Ihrem Wert darüber (${fmt(P)}). Der Fehler liegt weiter oben.`; }
       else { ar.status = "wrong"; Object.assign(ar, diagAmount(a, { s, D, A, R, B, rate, t, labels, i })); }
       add(ar);
       // Zwischenergebnis
@@ -517,7 +517,7 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
       const x = parseMoney(ans["r" + i]);
       const rr = { label: D.result, op: "=", sum: true, your: x, correct: R };
       if (x === null) { rr.status = "empty"; rr.cat = "leer"; rr.hint = "Dieses Feld ist leer."; }
-      else if (Number.isNaN(x)) { rr.status = "wrong"; rr.cat = "leer"; rr.hint = "Das ist keine gültige Zahl. Schreibe zum Beispiel 12,50."; }
+      else if (Number.isNaN(x)) { rr.status = "wrong"; rr.cat = "leer"; rr.hint = "Das ist keine gültige Zahl. Schreiben Sie zum Beispiel 12,50."; }
       else if (near(x, R)) rr.status = "ok";
       else if (near(x, own)) { rr.status = "folge"; rr.hint = `Richtig weitergerechnet: ${fmt(P)} ${D.op < 0 ? "−" : "+"} ${fmt(aUsed)} = ${fmt(own)}. Der Fehler liegt weiter oben.`; }
       else { rr.status = "wrong"; Object.assign(rr, diagResult(x, { P, aUsed, D, R, own })); }
@@ -529,14 +529,14 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
       const l = parseMoney(ans.laden);
       const row = { label: "Ladenpreis (Schwellenpreis)", op: "", final: true, your: l, correct: t.sol.laden };
       if (l === null) { row.status = "empty"; row.cat = "leer"; row.hint = "Dieses Feld ist leer."; }
-      else if (Number.isNaN(l)) { row.status = "wrong"; row.cat = "leer"; row.hint = "Das ist keine gültige Zahl. Schreibe zum Beispiel 24,99."; }
+      else if (Number.isNaN(l)) { row.status = "wrong"; row.cat = "leer"; row.hint = "Das ist keine gültige Zahl. Schreiben Sie zum Beispiel 24,99."; }
       else if (l === t.sol.laden) row.status = "ok";
-      else if (l === ownL) { row.status = "folge"; row.hint = `Richtig aufgerundet von deinem Bruttoverkaufspreis (${fmt(P)}).`; }
+      else if (l === ownL) { row.status = "folge"; row.hint = `Richtig aufgerundet von Ihrem Bruttoverkaufspreis (${fmt(P)}).`; }
       else {
         row.status = "wrong"; row.cat = "schwelle";
-        if (l < P) row.hint = `Dein Ladenpreis liegt unter dem Bruttoverkaufspreis (${fmt(P)}). Dann fehlt dir Gewinn. Runde auf: ${fmt(ownL)}.`;
+        if (l < P) row.hint = `Ihr Ladenpreis liegt unter dem Bruttoverkaufspreis (${fmt(P)}). Dann fehlt Gewinn. Runden Sie auf: ${fmt(ownL)}.`;
         else if (l % 100 !== 99) row.hint = `Ein Schwellenpreis endet auf ,99. Der nächste passende Preis ist ${fmt(ownL)}.`;
-        else row.hint = `Nimm den nächsten Preis mit ,99 über ${fmt(P)}: ${fmt(ownL)}.`;
+        else row.hint = `Nehmen Sie den nächsten Preis mit ,99 über ${fmt(P)}: ${fmt(ownL)}.`;
       }
       add(row);
     }
@@ -586,7 +586,7 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
         <h3>${L.title}</h3>
         <ul>${L.items.map(i => `<li>${i}</li>`).join("")}<li>${L.tasks} Aufgaben je Runde</li></ul>
         <div class="foot"><span class="muted" style="font-size:.9rem">Bestanden ab ${PASS} %</span>
-        <button class="btn${done ? " ghost" : ""}" data-start="${L.n}" ${open ? "" : "disabled"}>${!open ? "Gesperrt" : done ? "Nochmal üben" : "Stufe " + L.n + " üben"}</button></div>
+        <button class="btn${done ? " ghost" : ""}" data-start="${L.n}" ${open ? "" : "disabled"}>${!open ? "Gesperrt" : done ? "Wiederholen" : "Stufe " + L.n + " üben"}</button></div>
       </article>`;
     }).join("");
 
@@ -594,11 +594,11 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
       <div class="hero">
         <span class="eyebrow">Verkäufer/-in · 2. Ausbildungsjahr</span>
         <h1>Kalkulationstrainer Einzelhandel</h1>
-        <p class="lead">Übe die Vorwärtskalkulation: vom Angebot des Lieferers bis zum Preis im Regal. Fülle das Kalkulationsblatt aus. Am Ende siehst du deine Fehler und was du üben solltest.</p>
+        <p class="lead">Üben Sie die Vorwärtskalkulation: vom Angebot des Lieferers bis zum Preis im Regal. Füllen Sie das Kalkulationsblatt aus. Am Ende sehen Sie Ihre Fehler und was Sie noch üben sollten.</p>
       </div>
       <div class="setup">
-        <div class="grp"><label for="name">Dein Vorname (optional)</label><input id="name" type="text" autocomplete="given-name" maxlength="40" value="${esc(PROG.name || "")}" placeholder="z. B. Lena"></div>
-        <div class="grp"><span class="lab" id="br-lab">Waren aus deinem Ausbildungsbetrieb</span>
+        <div class="grp"><label for="name">Ihr Name (optional)</label><input id="name" type="text" autocomplete="given-name" maxlength="40" value="${esc(PROG.name || "")}" placeholder="z. B. Lena Schmidt"></div>
+        <div class="grp"><span class="lab" id="br-lab">Waren aus Ihrem Ausbildungsbetrieb</span>
           <div class="seg" role="group" aria-labelledby="br-lab">
             ${[["lm", "Lebensmittel"], ["bk", "Bekleidung"], ["mix", "Gemischt"]].map(([k, l]) => `<button data-branch="${k}" aria-pressed="${br === k}">${l}</button>`).join("")}
           </div></div>
@@ -607,11 +607,12 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
       <div class="info">
         <div class="panel"><h2>So funktioniert es</h2>
           <ul>
-            <li>Rechne jede Zeile und runde auf Cent. Komma oder Punkt sind beide erlaubt.</li>
+            <li>Rechnen Sie jede Zeile und runden Sie auf Cent. Komma oder Punkt sind beide erlaubt.</li>
             <li>Die Auswertung kommt am Ende der Runde.</li>
-            <li>Bestehst du eine Stufe mit mindestens ${PASS} %, wird die nächste freigeschaltet.</li>
-            <li>Rechnest du mit einem falschen Wert richtig weiter, ist das ein Folgefehler. Er kostet keinen weiteren Punkt.</li>
-            <li>Dein Fortschritt wird nur auf diesem Gerät gespeichert.</li>
+            <li>Bestehen Sie eine Stufe mit mindestens ${PASS} %, wird die nächste freigeschaltet.</li>
+            <li>Jede Stufe können Sie beliebig oft wiederholen, auch nach dem Bestehen. Bestandene Stufen bleiben freigeschaltet.</li>
+            <li>Rechnen Sie mit einem falschen Wert richtig weiter, ist das ein Folgefehler. Er kostet keinen weiteren Punkt.</li>
+            <li>Ihr Fortschritt wird nur auf diesem Gerät gespeichert.</li>
           </ul></div>
         <div class="panel"><h2>Das Kalkulationsschema</h2>
           <p class="muted" style="font-size:.92rem">Beispiel: Jeans im Modehaus Brüggemann</p>
@@ -688,7 +689,7 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
             ${rows}
           </div>
           ${S.warn ? `<div class="warn" role="alert"><p><b>${empties} ${empties === 1 ? "Feld ist" : "Felder sind"} noch leer.</b> Leere Felder zählen als Fehler.</p>
-            <div class="acts"><button class="btn" data-act="eval-force">Trotzdem auswerten</button><button class="btn ghost" data-act="warn-off">Weiter rechnen</button></div></div>` : ""}
+            <div class="acts"><button class="btn" data-act="eval-force">Trotzdem auswerten</button><button class="btn ghost" data-act="warn-off">Weiterrechnen</button></div></div>` : ""}
           <div class="nav">
             <button class="btn ghost" data-act="prev" ${S.idx === 0 ? "disabled" : ""}>← Vorherige Aufgabe</button>
             ${isLast ? `<button class="btn" data-act="eval" id="next-btn">Auswerten</button>` : `<button class="btn" data-act="next" id="next-btn">Nächste Aufgabe →</button>`}
@@ -729,11 +730,11 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
     const name = PROG.name ? esc(PROG.name) : "";
     const catList = Object.entries(R.cats).sort((a, b) => b[1] - a[1]);
     let verdict;
-    if (R.passed) verdict = `<div class="verdict pass">Stufe ${L.n} bestanden${name ? ", " + name : ""}! ${S.level < 4 ? (R.newUnlock ? `Stufe ${S.level + 1} ist jetzt freigeschaltet.` : `Stufe ${S.level + 1} ist offen.`) : "Du hast alle Stufen geschafft."}</div>`;
-    else verdict = `<div class="verdict fail">Noch nicht bestanden. Du brauchst mindestens ${PASS} %. Schau dir unten deine Fehler an und versuche es mit neuen Aufgaben noch einmal.</div>`;
+    if (R.passed) verdict = `<div class="verdict pass">Stufe ${L.n} bestanden! ${S.level < 4 ? (R.newUnlock ? `Stufe ${S.level + 1} ist jetzt freigeschaltet.` : `Stufe ${S.level + 1} ist offen.`) : "Sie haben alle Stufen geschafft."}</div>`;
+    else verdict = `<div class="verdict fail">Noch nicht bestanden. Sie brauchen mindestens ${PASS} %. Sehen Sie sich unten Ihre Fehler an und wiederholen Sie die Übung.</div>`;
 
     const practice = catList.length ? catList.map(([c, n]) => `<div class="panel"><h3><span>${CATS[c].t}</span><span class="chip bad">${n}×</span></h3><p>${CATS[c].d}</p><div class="ex">${esc(CATS[c].ex)}</div></div>`).join("")
-      : `<div class="panel"><h3>Keine Fehler</h3><p>Alles richtig gerechnet. Stark!</p></div>`;
+      : `<div class="panel"><h3>Keine Fehler</h3><p>Alles richtig gerechnet. Sehr gut!</p></div>`;
 
     const tasks = R.per.map((r, i) => {
       const t = S.tasks[i];
@@ -751,7 +752,7 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
         <summary><span class="t">Aufgabe ${i + 1} · ${esc(t.product.name)}</span><span class="chip ${errs ? "bad" : "good"}">${r.pts} von ${r.max} Punkten</span></summary>
         <div class="res-body">
           <p class="muted" style="font-size:.92rem">${taskFacts(t).map(([k, v]) => `${k}: ${v}`).join(" · ")}</p>
-          <div class="rt"><div class="rr head"><span></span><span>Position</span><span style="text-align:right">Deine Eingabe</span><span style="text-align:right">Richtig</span><span></span></div>${rows}</div>
+          <div class="rt"><div class="rr head"><span></span><span>Position</span><span style="text-align:right">Ihre Eingabe</span><span style="text-align:right">Richtig</span><span></span></div>${rows}</div>
         </div></details>`;
     }).join("");
 
@@ -766,11 +767,12 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
           ${verdict}
         </div>
       </div>
-      <div class="section"><h2>${catList.length ? "Das solltest du üben" : "Ergebnis"}</h2><div class="practice">${practice}</div></div>
-      <div class="section"><h2>Deine Aufgaben im Detail</h2><p class="muted"><span class="chip ok">Folgefehler ✓</span> bedeutet: Du hast mit deinem falschen Wert von oben richtig weitergerechnet. Das zählt als richtig.</p>${tasks}</div>
+      <div class="section"><h2>${catList.length ? "Das sollten Sie üben" : "Ergebnis"}</h2><div class="practice">${practice}</div></div>
+      <div class="section"><h2>Ihre Aufgaben im Detail</h2><p class="muted"><span class="chip ok">Folgefehler ✓</span> bedeutet: Sie haben mit Ihrem falschen Wert von oben richtig weitergerechnet. Das zählt als richtig.</p>${tasks}</div>
       <div class="actions">
         ${R.passed && S.level < 4 ? `<button class="btn" data-start="${S.level + 1}">Weiter zu Stufe ${S.level + 1} →</button>` : ""}
-        <button class="btn${R.passed && S.level < 4 ? " ghost" : ""}" data-start="${S.level}">Neue Aufgaben auf Stufe ${S.level}</button>
+        <button class="btn${R.passed && S.level < 4 ? " ghost" : ""}" data-act="same">Dieselben Aufgaben wiederholen</button>
+        <button class="btn ghost" data-start="${S.level}">Neue Aufgaben auf Stufe ${S.level}</button>
         <button class="btn ghost" data-act="home">Zur Übersicht</button>
       </div>
     </section>`;
@@ -789,6 +791,7 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
     if (act === "next") { S.idx = Math.min(S.tasks.length - 1, S.idx + 1); return render(); }
     if (act === "eval") { if (countEmpty() > 0) { S.warn = true; renderTask(); const w = app.querySelector(".warn"); if (w) w.scrollIntoView({ block: "center" }); return; } return evaluateRound(); }
     if (act === "eval-force") return evaluateRound();
+    if (act === "same") { S.answers = S.tasks.map(() => ({})); S.idx = 0; S.warn = false; S.result = null; S.screen = "task"; return render(); }
     if (act === "warn-off") { S.warn = false; const first = [...app.querySelectorAll("[data-k]")].find(el => !el.value.trim()); renderTask(); const el = first && document.getElementById(first.id); if (el) el.focus(); return; }
     if (act === "reset") { S.resetAsk = true; return renderHome(); }
     if (act === "reset-no") { S.resetAsk = false; return renderHome(); }

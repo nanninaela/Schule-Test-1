@@ -69,6 +69,8 @@ Online-Übung zur Vorwärtskalkulation für Verkäuferinnen und Verkäufer im 2.
 
 - Die Aufgaben werden bei jeder Runde mit neuen Zahlen erzeugt.
 - Eine Stufe ist ab 80 % bestanden. Erst dann wird die nächste freigeschaltet.
+- Jede Stufe kann beliebig oft wiederholt werden, auch nach dem Bestehen: mit denselben Aufgaben oder mit neuen Zahlen.
+- Die Schülerinnen und Schüler werden gesiezt.
 - Folgefehler werden nicht doppelt bestraft.
 - Die Auswertung zeigt jede Zeile mit Eingabe und richtigem Wert. Bei Fehlern steht ein Hinweis, was falsch gemacht wurde (z. B. falsche Bezugsgröße, falsches Rechenzeichen, im Hundert statt vom Hundert gerechnet, falscher Steuersatz, Komma verrutscht, Lieferungskosten nicht aufgeteilt). Darüber steht „Das solltest du üben“ mit Erklärung und Beispiel.
 - Der Fortschritt wird nur im Browser des Geräts gespeichert.
