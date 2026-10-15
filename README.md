@@ -56,7 +56,7 @@ Szenarien stehen im Array `SCENARIOS` in `verkaufsgespraech.html`. Jedes Szenari
 
 # Kalkulationstrainer Einzelhandel (Handelskalkulation)
 
-Online-Übung zur Vorwärtskalkulation für Verkäuferinnen und Verkäufer im 2. Ausbildungsjahr (NRW). Die Waren stammen aus den Ausbildungsbetrieben Lebensmittel (Frischemarkt Kortmann) und Bekleidung (Modehaus Brüggemann). Auf der Startseite geben die Schülerinnen und Schüler zuerst ihren Vornamen ein (Pflichtfeld, steht auf dem Ergebnis) und wählen ihren Ausbildungsbetrieb (Lebensmittel, Bekleidung oder Gemischt); vorher lässt sich keine Stufe starten. Artikel, Rabatte, Zuschläge, Steuersätze und das Beispielschema richten sich nach dieser Wahl.
+Online-Übung zur Vorwärtskalkulation für Verkäuferinnen und Verkäufer im 2. Ausbildungsjahr (NRW). Die Waren stammen aus den Ausbildungsbetrieben Lebensmittel (Frischemarkt Kortmann) und Bekleidung (Modehaus Brüggemann). Die Schülerinnen und Schüler melden sich zuerst mit ihrem Vornamen an (Pflichtfeld, steht auf dem Ergebnis) und wählen dann ihren Ausbildungsbetrieb (Lebensmittel, Bekleidung oder Gemischt); vorher lässt sich keine Stufe starten. Artikel, Rabatte, Zuschläge, Steuersätze und das Beispielschema richten sich nach dieser Wahl.
 
 ## Stufen
 
@@ -74,7 +74,8 @@ Online-Übung zur Vorwärtskalkulation für Verkäuferinnen und Verkäufer im 2.
 - Folgefehler werden nicht doppelt bestraft.
 - Zur nächsten Aufgabe bzw. zur Auswertung geht es erst, wenn alle Felder mit gültigen Zahlen ausgefüllt sind. Fehlende Felder werden rot markiert.
 - Die Auswertung zeigt jede Zeile mit Eingabe und richtigem Wert. Bei Fehlern steht ein Hinweis, was falsch gemacht wurde (z. B. falsche Bezugsgröße, falsches Rechenzeichen, im Hundert statt vom Hundert gerechnet, falscher Steuersatz, Komma verrutscht, Lieferungskosten nicht aufgeteilt). Darüber steht „Das solltest du üben“ mit Erklärung und Beispiel.
-- Der Fortschritt wird nur im Browser des Geräts gespeichert.
+- Die ganze Klasse kann gleichzeitig üben. Die Übung läuft vollständig im Browser des jeweiligen Geräts; es werden keine Daten an einen Server geschickt oder mit anderen geteilt. Niemand sieht die Ergebnisse der anderen.
+- Der Fortschritt wird pro Vorname nur auf dem Gerät gespeichert. Teilen sich mehrere Personen ein Gerät, meldet sich jede am Ende über „Abmelden“ ab; die nächste Person sieht dann nur ihren eigenen Stand.
 - **Für die Lehrkraft:** Mit `#lehrkraft` am Ende des Links sind alle Stufen offen.
 
 ## Dateien

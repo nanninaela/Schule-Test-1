@@ -140,6 +140,12 @@ button, select, input { font: inherit; color: inherit; }
 .schema .sr .o { font-family: var(--f-mono); color: var(--muted); }
 .schema .sr .v { font-family: var(--f-mono); font-variant-numeric: tabular-nums; text-align: right; }
 .schema .sr small { color: var(--muted); font-weight: 400; }
+.login { margin-top: 26px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); display: grid; gap: 10px; max-width: 34rem; }
+.login label { font-weight: 700; color: var(--muted); font-size: .9rem; }
+.login-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.login-row input { flex: 1 1 12rem; min-width: 0; border: 1.5px solid var(--line); background: var(--paper); border-radius: 10px; padding: .55rem .8rem; min-height: 44px; }
+.login-err { color: var(--bad); font-weight: 700; }
+.who-row { display: flex; gap: 14px; align-items: center; min-height: 44px; font-size: 1.1rem; }
 .teacher { margin-top: 28px; font-size: .9rem; color: var(--muted); display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
 
 /* ---------- Übung ---------- */
@@ -539,20 +545,36 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
   }
 
   /* ================= Fortschritt ================= */
-  function loadProgress() {
-    try { const p = JSON.parse(localStorage.getItem(STORE_KEY)); if (p && typeof p === "object") return Object.assign({ passed: {}, best: {}, name: "", branch: "" }, p); } catch (e) {}
-    return { passed: {}, best: {}, name: "", branch: "" };
+  // Jede Person hat auf dem Gerät einen eigenen Fortschritt unter ihrem Vornamen.
+  // Angezeigt wird immer nur der Fortschritt der angemeldeten Person.
+  const STORE_KEY_USERS = "kalkulationstrainer-v2";
+  const userKey = n => n.trim().toLocaleLowerCase("de-DE");
+  function loadAll() {
+    try { const a = JSON.parse(localStorage.getItem(STORE_KEY_USERS)); if (a && a.users) return a; } catch (e) {}
+    const all = { users: {} };
+    try { // Fortschritt aus der Vorversion übernehmen
+      const old = JSON.parse(localStorage.getItem(STORE_KEY));
+      if (old && old.name) all.users[userKey(old.name)] = { name: old.name, passed: old.passed || {}, best: old.best || {}, branch: old.branch || "" };
+    } catch (e) {}
+    return all;
   }
-  function saveProgress() { try { localStorage.setItem(STORE_KEY, JSON.stringify(PROG)); } catch (e) {} }
-  let PROG = loadProgress();
+  const STORE = loadAll();
+  let PROG = null; // angemeldete Person
+  function saveProgress() { if (!PROG) return; STORE.users[userKey(PROG.name)] = PROG; try { localStorage.setItem(STORE_KEY_USERS, JSON.stringify(STORE)); } catch (e) {} }
+  function login(name) {
+    const k = userKey(name);
+    PROG = Object.assign({ passed: {}, best: {}, branch: "" }, STORE.users[k] || {}, { name: name.trim() });
+    saveProgress();
+  }
   const teacher = () => location.hash === "#lehrkraft";
-  const unlocked = n => n === 1 || teacher() || !!PROG.passed[n - 1];
+  const unlocked = n => n === 1 || teacher() || !!(PROG && PROG.passed[n - 1]);
 
   /* ================= Zustand & Rendern ================= */
   let S = { screen: "home", level: 1, tasks: [], answers: [], idx: 0, help: false, warn: false, result: null, resetAsk: false };
   const app = document.getElementById("app");
 
   function render() {
+    if (!PROG) S.screen = "home";
     if (S.screen === "task") renderTask();
     else if (S.screen === "result") renderResult();
     else renderHome();
@@ -560,7 +582,7 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
   }
 
   function startLevel(n) {
-    if (!unlocked(n) || !BRANCH_KEYS.includes(PROG.branch) || !PROG.name) return;
+    if (!PROG || !unlocked(n) || !BRANCH_KEYS.includes(PROG.branch)) return;
     S = { screen: "task", level: n, tasks: makeRound(n, PROG.branch), answers: [], idx: 0, help: false, warn: false, result: null };
     S.answers = S.tasks.map(() => ({}));
     render();
@@ -581,20 +603,52 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
   }
   function startLabel(n, open, done) {
     if (!open) return "Gesperrt";
-    if (!PROG.name) return "Erst Vornamen eingeben";
     if (!BRANCH_KEYS.includes(PROG.branch)) return "Erst Betrieb wählen";
     return done ? "Wiederholen" : "Stufe " + n + " üben";
   }
   function updateStartButtons() {
-    const ready = !!PROG.name && BRANCH_KEYS.includes(PROG.branch);
+    const ready = !!PROG && BRANCH_KEYS.includes(PROG.branch);
     app.querySelectorAll("[data-start][data-open]").forEach(b => {
       const open = b.dataset.open === "true";
       b.disabled = !(open && ready);
       b.textContent = startLabel(+b.dataset.start, open, b.dataset.done === "true");
     });
-    const h = document.getElementById("need-name"); if (h) h.hidden = !!PROG.name;
+  }
+  const INFO = () => `<div class="info">
+        <div class="panel"><h2>So funktioniert es</h2>
+          <ul>
+            <li>Melden Sie sich mit Ihrem Vornamen an. Sie sehen nur Ihre eigenen Ergebnisse.</li>
+            <li>Rechnen Sie jede Zeile und runden Sie auf Cent. Komma oder Punkt sind beide erlaubt.</li>
+            <li>Erst wenn alle Felder einer Aufgabe ausgefüllt sind, geht es zur nächsten Aufgabe.</li>
+            <li>Die Auswertung kommt am Ende der Runde.</li>
+            <li>Bestehen Sie eine Stufe mit mindestens ${PASS} %, wird die nächste freigeschaltet.</li>
+            <li>Jede Stufe können Sie beliebig oft wiederholen, auch nach dem Bestehen. Bestandene Stufen bleiben freigeschaltet.</li>
+            <li>Rechnen Sie mit einem falschen Wert richtig weiter, ist das ein Folgefehler. Er kostet keinen weiteren Punkt.</li>
+            <li>Ihr Fortschritt wird nur auf diesem Gerät gespeichert. Melden Sie sich am Ende ab, damit die nächste Person neu beginnt.</li>
+          </ul></div>
+        <div class="panel"><h2>Das Kalkulationsschema</h2>
+          ${exampleSchema(PROG ? PROG.branch : "")}</div>
+      </div>`;
+  const HERO = `<div class="hero">
+        <span class="eyebrow">Verkäufer/-in · 2. Ausbildungsjahr</span>
+        <h1>Kalkulationstrainer Einzelhandel</h1>
+        <p class="lead">Üben Sie die Vorwärtskalkulation: vom Angebot des Lieferers bis zum Preis im Regal. Füllen Sie das Kalkulationsblatt aus. Am Ende sehen Sie Ihre Fehler und was Sie noch üben sollten.</p>
+      </div>`;
+  function renderLogin() {
+    app.innerHTML = `<section class="screen">${HERO}
+      <form class="login" id="login-form" novalidate>
+        <h2>Anmelden</h2>
+        <label for="login-name">Ihr Vorname (Pflichtfeld)</label>
+        <div class="login-row"><input id="login-name" type="text" autocomplete="off" maxlength="40" required aria-required="true" placeholder="z. B. Lena">
+        <button class="btn" type="submit">Anmelden</button></div>
+        <p class="login-err" id="login-err" role="alert" hidden>Bitte geben Sie Ihren Vornamen ein.</p>
+        <p class="muted" style="font-size:.9rem">Ihr Fortschritt wird unter Ihrem Vornamen nur auf diesem Gerät gespeichert. Niemand sonst sieht Ihre Ergebnisse.</p>
+      </form>
+      ${INFO()}
+    </section>`;
   }
   function renderHome() {
+    if (!PROG) return renderLogin();
     const br = PROG.branch;
     const cards = LEVELS.map(L => {
       const open = unlocked(L.n), done = !!PROG.passed[L.n], best = PROG.best[L.n];
@@ -613,38 +667,20 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
     }).join("");
 
     app.innerHTML = `<section class="screen">
-      <div class="hero">
-        <span class="eyebrow">Verkäufer/-in · 2. Ausbildungsjahr</span>
-        <h1>Kalkulationstrainer Einzelhandel</h1>
-        <p class="lead">Üben Sie die Vorwärtskalkulation: vom Angebot des Lieferers bis zum Preis im Regal. Füllen Sie das Kalkulationsblatt aus. Am Ende sehen Sie Ihre Fehler und was Sie noch üben sollten.</p>
-      </div>
+      ${HERO}
       <div class="setup">
-        <div class="grp"><label for="name">Ihr Vorname (Pflichtfeld)</label><input id="name" type="text" autocomplete="given-name" maxlength="40" required aria-required="true" value="${esc(PROG.name || "")}" placeholder="z. B. Lena"></div>
+        <div class="grp"><span class="lab">Angemeldet als</span><div class="who-row"><b>${esc(PROG.name)}</b><button class="linkbtn" data-act="logout">Abmelden</button></div></div>
         <div class="grp"><span class="lab" id="br-lab">Waren aus Ihrem Ausbildungsbetrieb</span>
           <div class="seg" role="group" aria-labelledby="br-lab">
             ${[["lm", "Lebensmittel"], ["bk", "Bekleidung"], ["mix", "Gemischt"]].map(([k, l]) => `<button data-branch="${k}" aria-pressed="${br === k}">${l}</button>`).join("")}
           </div></div>
       </div>
-      <p class="pick-hint" id="need-name"${PROG.name ? " hidden" : ""}>Bitte geben Sie zuerst Ihren Vornamen ein. Er steht auf Ihrem Ergebnis.</p>
       ${branchInfo(br)}
       <div class="levels">${cards}</div>
-      <div class="info">
-        <div class="panel"><h2>So funktioniert es</h2>
-          <ul>
-            <li>Rechnen Sie jede Zeile und runden Sie auf Cent. Komma oder Punkt sind beide erlaubt.</li>
-            <li>Erst wenn alle Felder einer Aufgabe ausgefüllt sind, geht es zur nächsten Aufgabe.</li>
-            <li>Die Auswertung kommt am Ende der Runde.</li>
-            <li>Bestehen Sie eine Stufe mit mindestens ${PASS} %, wird die nächste freigeschaltet.</li>
-            <li>Jede Stufe können Sie beliebig oft wiederholen, auch nach dem Bestehen. Bestandene Stufen bleiben freigeschaltet.</li>
-            <li>Rechnen Sie mit einem falschen Wert richtig weiter, ist das ein Folgefehler. Er kostet keinen weiteren Punkt.</li>
-            <li>Ihr Fortschritt wird nur auf diesem Gerät gespeichert.</li>
-          </ul></div>
-        <div class="panel"><h2>Das Kalkulationsschema</h2>
-          ${exampleSchema(br)}</div>
-      </div>
+      ${INFO()}
       <div class="teacher">${S.resetAsk
-        ? `<span>Fortschritt auf diesem Gerät wirklich löschen?</span><button class="btn ghost" data-act="reset-yes">Ja, löschen</button><button class="linkbtn" data-act="reset-no">Abbrechen</button>`
-        : `<button class="linkbtn" data-act="reset">Fortschritt zurücksetzen</button>`}
+        ? `<span>Ihren Fortschritt (${esc(PROG.name)}) wirklich löschen?</span><button class="btn ghost" data-act="reset-yes">Ja, löschen</button><button class="linkbtn" data-act="reset-no">Abbrechen</button>`
+        : `<button class="linkbtn" data-act="reset">Meinen Fortschritt zurücksetzen</button>`}
         ${teacher() ? `<span class="chip ok">Lehrkraft-Ansicht: alle Stufen offen</span>` : ""}</div>
     </section>`;
     updateStartButtons();
@@ -812,6 +848,7 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
         <button class="btn${R.passed && S.level < 4 ? " ghost" : ""}" data-act="same">Dieselben Aufgaben wiederholen</button>
         <button class="btn ghost" data-start="${S.level}">Neue Aufgaben auf Stufe ${S.level}</button>
         <button class="btn ghost" data-act="home">Zur Übersicht</button>
+        <button class="btn ghost" data-act="logout">Abmelden</button>
       </div>
     </section>`;
   }
@@ -823,6 +860,7 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
     if (b.dataset.start) return startLevel(+b.dataset.start);
     if (b.dataset.branch) { PROG.branch = b.dataset.branch; saveProgress(); return renderHome(); }
     const act = b.dataset.act;
+    if (act === "logout") { PROG = null; S = { screen: "home", level: 1, tasks: [], answers: [], idx: 0, help: false, warn: false, result: null, resetAsk: false }; render(); const n = document.getElementById("login-name"); if (n) n.focus(); return; }
     if (act === "home") { S.screen = "home"; S.resetAsk = false; return render(); }
     if (act === "help") { S.help = !S.help; document.getElementById("sheet").classList.toggle("show-help", S.help); b.textContent = S.help ? "Rechenweg ausblenden" : "Rechenweg zeigen"; return; }
     if (act === "prev") { S.idx = Math.max(0, S.idx - 1); S.warn = false; return render(); }
@@ -836,12 +874,12 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
     if (act === "same") { S.answers = S.tasks.map(() => ({})); S.idx = 0; S.warn = false; S.result = null; S.screen = "task"; return render(); }
     if (act === "reset") { S.resetAsk = true; return renderHome(); }
     if (act === "reset-no") { S.resetAsk = false; return renderHome(); }
-    if (act === "reset-yes") { const name = PROG.name, branch = PROG.branch; PROG = { passed: {}, best: {}, name, branch }; saveProgress(); S.resetAsk = false; return renderHome(); }
+    if (act === "reset-yes") { PROG.passed = {}; PROG.best = {}; saveProgress(); S.resetAsk = false; return renderHome(); }
   });
 
   app.addEventListener("input", e => {
     const el = e.target;
-    if (el.id === "name") { PROG.name = el.value.trim(); saveProgress(); updateStartButtons(); return; }
+    if (el.id === "login-name") { const e2 = document.getElementById("login-err"); if (e2) e2.hidden = true; return; }
     if (el.dataset.k && S.screen === "task") { S.answers[S.idx][el.dataset.k] = el.value; refreshReady(el); }
   });
   function refreshReady(el) {
@@ -862,11 +900,21 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
     const n = els[els.indexOf(e.target) + 1];
     if (n) n.focus(); else { const nb = document.getElementById("next-btn"); if (nb) nb.focus(); }
   });
+  app.addEventListener("submit", e => {
+    if (e.target.id !== "login-form") return;
+    e.preventDefault();
+    const name = document.getElementById("login-name").value.trim();
+    if (!name) { document.getElementById("login-err").hidden = false; document.getElementById("login-name").focus(); return; }
+    login(name); S.screen = "home"; render();
+  });
   window.addEventListener("hashchange", () => { if (S.screen === "home") renderHome(); });
 
   /* ================= Start ================= */
-  window.claude?.hot?.snapshot?.(() => ({ S }));
-  const boot = data => { if (data && data.S && data.S.screen) S = data.S; render(); };
+  window.claude?.hot?.snapshot?.(() => ({ S, user: PROG ? PROG.name : null }));
+  const boot = data => {
+    if (data && data.user) { login(data.user); if (data.S && data.S.screen) S = data.S; }
+    render();
+  };
   window.claude?.hot?.ready ? window.claude.hot.ready(boot) : boot(window.claude?.hot?.data ?? {});
 })();
 </script>
