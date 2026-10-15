@@ -65,7 +65,7 @@ Online-Übung zur Vorwärtskalkulation für Verkäuferinnen und Verkäufer im 2.
 | 1 Einstieg | Bezugspreis → Handlungskosten → Gewinn → Umsatzsteuer, glatte Beträge, Rechenweg-Hilfe | 4 |
 | 2 Einkauf | Listeneinkaufspreis → Rabatt → Skonto → Bezugskosten, Rechenweg-Hilfe | 4 |
 | 3 Gesamt | komplette Vorwärtskalkulation bis zum Bruttoverkaufspreis | 3 |
-| 4 Profi | Bezugskosten der Lieferung aufteilen, Steuersatz (7 %/19 %) selbst bestimmen, Schwellenpreis ,99 | 3 |
+| 4 Profi | Bezugskosten der Lieferung aufteilen, Steuersatz (7 %/19 %) selbst bestimmen | 3 |
 
 - Die Aufgaben werden bei jeder Runde mit neuen Zahlen erzeugt.
 - Eine Stufe ist ab 80 % bestanden. Erst dann wird die nächste freigeschaltet.

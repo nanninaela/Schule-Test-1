@@ -129,7 +129,6 @@ button, select, input { font: inherit; color: inherit; }
 .chip.good { background: var(--good-soft); color: var(--good); }
 .chip.bad { background: var(--bad-soft); color: var(--bad); }
 .chip.ok { background: var(--ok-soft); color: var(--ok); }
-.chip.price { background: var(--tag); color: var(--tag-ink); font-family: var(--f-mono); }
 
 .info { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 40px; }
 @media (max-width: 720px) { .info { grid-template-columns: 1fr; } }
@@ -257,7 +256,6 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
   const shuffle = a => { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
   const pct = (cents, rate) => Math.round(cents * rate / 100 + 1e-7);
   const near = (x, y, t = TOL) => Math.abs(x - y) <= t;
-  const schwelle = c => { let e = Math.floor(c / 100) * 100 + 99; if (e < c) e += 100; return e; };
 
   function parseMoney(raw) {
     if (raw == null) return null;
@@ -289,8 +287,8 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
       items: ["Liefererrabatt, Liefererskonto, Bezugskosten", "Rechenweg-Hilfe einblendbar"] },
     { n: 3, name: "Gesamt", title: "Die komplette Vorwärtskalkulation", tasks: 3, start: "lep", steps: ALL,
       items: ["alle Stufen vom Listeneinkaufspreis bis zum Bruttoverkaufspreis", "krumme Beträge, ohne Hilfe"] },
-    { n: 4, name: "Profi", title: "Lieferung, Steuersatz und Ladenpreis", tasks: 3, start: "lep", steps: ALL, bkTotal: true, ustSelect: true, schwelle: true,
-      items: ["Bezugskosten der ganzen Lieferung aufteilen", "Steuersatz selbst bestimmen (7 % oder 19 %)", "Schwellenpreis auf ,99 festlegen"] }
+    { n: 4, name: "Profi", title: "Lieferung und Steuersatz", tasks: 3, start: "lep", steps: ALL, bkTotal: true, ustSelect: true,
+      items: ["Bezugskosten der ganzen Lieferung aufteilen", "Steuersatz selbst bestimmen (7 % oder 19 %)"] }
   ];
 
   const BRANCHES = {
@@ -338,8 +336,7 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
     runden: { t: "Auf Cent runden", d: "Rechnen Sie genau und runden Sie jedes Ergebnis auf zwei Nachkommastellen. Ist die dritte Stelle 5 oder größer, wird aufgerundet.", ex: "12,345 € → 12,35 €   ·   12,344 € → 12,34 €" },
     rechnen: { t: "Zwischenergebnisse genau rechnen", d: "Kontrollieren Sie Addition und Subtraktion. Machen Sie vorher einen Überschlag: Passt das Ergebnis ungefähr?", ex: "34,12 + 15,35 = 49,47  (Überschlag: 34 + 15 = 49)" },
     zeile: { t: "Betrag und Zwischenergebnis trennen", d: "Jede Rechenstufe hat zwei Zeilen: erst den Euro-Betrag (zum Beispiel den Rabatt), dann nach dem Summenstrich das neue Zwischenergebnis (zum Beispiel den Zieleinkaufspreis).", ex: "− Rabatt 6,00 €  /  = Zieleinkaufspreis 34,00 €" },
-    bezugskosten: { t: "Bezugskosten pro Stück", d: "Gelten Fracht oder Verpackung für die ganze Lieferung, teilen Sie sie durch die Bestellmenge. Erst dann kommen sie in die Kalkulation je Stück.", ex: "36,00 € ÷ 48 Stück = 0,75 € je Stück" },
-    schwelle: { t: "Schwellenpreise", d: "Der Ladenpreis endet auf ,99 und liegt nie unter dem kalkulierten Bruttoverkaufspreis. Sonst fehlt Gewinn.", ex: "23,41 € → 23,99 €   ·   23,99 € → 23,99 €" }
+    bezugskosten: { t: "Bezugskosten pro Stück", d: "Gelten Fracht oder Verpackung für die ganze Lieferung, teilen Sie sie durch die Bestellmenge. Erst dann kommen sie in die Kalkulation je Stück.", ex: "36,00 € ÷ 48 Stück = 0,75 € je Stück" }
   };
 
   /* ================= Aufgaben erzeugen ================= */
@@ -356,7 +353,7 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
       v += D.op * a;
       amts.push(a); vals.push(v);
     });
-    return { vals, amts, laden: t.schwelle ? schwelle(v) : null };
+    return { vals, amts };
   }
 
   function choosePairs(level, branch) {
@@ -382,7 +379,7 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
   function makeTask(level, bKey, p) {
     const L = LEVELS[level - 1];
     const B = BRANCHES[bKey];
-    const t = { level, branch: bKey, product: p, start: L.start, steps: [], schwelle: !!L.schwelle, ustSelect: !!L.ustSelect };
+    const t = { level, branch: bKey, product: p, start: L.start, steps: [], ustSelect: !!L.ustSelect };
     if (L.start === "bzp") {
       t.startValue = randInt(Math.round(p.lep[0] * .8 / 50), Math.round(p.lep[1] * .8 / 50)) * 50;
     } else if (level === 2) {
@@ -422,7 +419,6 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
   function taskGoal(t) {
     const p = t.product;
     if (t.level === 2) return `Berechnen Sie den Bezugspreis ${p.per}.`;
-    if (t.schwelle) return `Kalkulieren Sie den Bruttoverkaufspreis ${p.per} und legen Sie den Ladenpreis fest.`;
     return `Berechnen Sie den Bruttoverkaufspreis ${p.per}.`;
   }
   function taskFacts(t) {
@@ -438,7 +434,6 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
       if (s.key === "gewinn") f.push(["Gewinnzuschlag", s.rate + " %"]);
       if (s.key === "ust") f.push(["Umsatzsteuer", t.ustSelect ? "selbst bestimmen" : s.rate + " %"]);
     });
-    if (t.schwelle) f.push(["Ladenpreis", "Schwellenpreis mit Endung ,99"]);
     return f;
   }
 
@@ -533,22 +528,6 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
       add(rr);
       P = (x === null || Number.isNaN(x)) ? own : x;
     });
-    if (t.schwelle) {
-      const ownL = schwelle(P);
-      const l = parseMoney(ans.laden);
-      const row = { label: "Ladenpreis (Schwellenpreis)", op: "", final: true, your: l, correct: t.sol.laden };
-      if (l === null) { row.status = "empty"; row.cat = "leer"; row.hint = "Dieses Feld ist leer."; }
-      else if (Number.isNaN(l)) { row.status = "wrong"; row.cat = "leer"; row.hint = "Das ist keine gültige Zahl. Schreiben Sie zum Beispiel 24,99."; }
-      else if (l === t.sol.laden) row.status = "ok";
-      else if (l === ownL) { row.status = "folge"; row.hint = `Richtig aufgerundet von Ihrem Bruttoverkaufspreis (${fmt(P)}).`; }
-      else {
-        row.status = "wrong"; row.cat = "schwelle";
-        if (l < P) row.hint = `Ihr Ladenpreis liegt unter dem Bruttoverkaufspreis (${fmt(P)}). Dann fehlt Gewinn. Runden Sie auf: ${fmt(ownL)}.`;
-        else if (l % 100 !== 99) row.hint = `Ein Schwellenpreis endet auf ,99. Der nächste passende Preis ist ${fmt(ownL)}.`;
-        else row.hint = `Nehmen Sie den nächsten Preis mit ,99 über ${fmt(P)}: ${fmt(ownL)}.`;
-      }
-      add(row);
-    }
     return out;
   }
 
@@ -635,7 +614,7 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
   }
 
   function exampleSchema() {
-    const t = { start: "lep", startValue: 4000, schwelle: true, product: BRANCHES.bk.products[0],
+    const t = { start: "lep", startValue: 4000, product: BRANCHES.bk.products[0],
       steps: [{ key: "rabatt", rate: 15 }, { key: "skonto", rate: 2 }, { key: "bezug", amount: 80 }, { key: "hk", rate: 45 }, { key: "gewinn", rate: 15 }, { key: "ust", rate: 19 }] };
     t.sol = solve(t);
     const base = ["vom Listeneinkaufspreis", "vom Zieleinkaufspreis", "je Stück", "vom Bezugspreis", "vom Selbstkostenpreis", "vom Nettoverkaufspreis"];
@@ -645,7 +624,7 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
       h += `<div class="sr"><span class="o">${D.op < 0 ? "−" : "+"}</span><span>${D.amount} <small>${s.rate ? s.rate + " % " : ""}${base[i]}</small></span><span class="v">${fmt(t.sol.amts[i])}</span></div>`;
       h += `<div class="sr sum"><span class="o">=</span><span>${D.result}</span><span class="v">${fmt(t.sol.vals[i + 1])}</span></div>`;
     });
-    h += `<div class="sr"><span class="o">→</span><span>Ladenpreis <small>Schwellenpreis</small></span><span class="v">${fmt(t.sol.laden)}</span></div></div>`;
+    h += `</div>`;
     return h;
   }
 
@@ -667,12 +646,11 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
       rows += `<div class="row"><span class="op">${D.op < 0 ? "−" : "+"}</span><span class="lbl"><label for="${id("a" + i)}">${D.amount}</label>${chip}</span>${input("a" + i, D.amount)}`;
       if (L.help) rows += `<div class="help">${D.type === "fixed" ? "Betrag aus dem Angebot übernehmen" : `${short(labels[i])} × ${s.rate} ÷ 100`}</div>`;
       rows += `</div>`;
-      const last = i === t.steps.length - 1 && !t.schwelle;
+      const last = i === t.steps.length - 1;
       rows += `<div class="row sum${last ? " final" : ""}"><span class="op">=</span><span class="lbl"><label for="${id("r" + i)}">${D.result}</label></span>${input("r" + i, D.result)}`;
       if (L.help) rows += `<div class="help">${short(labels[i])} ${D.op < 0 ? "−" : "+"} ${D.amount}</div>`;
       rows += `</div>`;
     });
-    if (t.schwelle) rows += `<div class="row final"><span class="op">→</span><span class="lbl"><label for="${id("laden")}">Ladenpreis</label><span class="chip price">,99</span></span>${input("laden", "Ladenpreis")}</div>`;
 
     const dots = S.tasks.map((_, i) => `<span class="${i === S.idx ? "on" : isFilled(i) ? "done" : ""}"></span>`).join("");
     const isLast = S.idx === S.tasks.length - 1;
@@ -711,7 +689,6 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
   function fieldKeys(t) {
     const k = [];
     t.steps.forEach((s, i) => { if (s.key === "ust" && t.ustSelect) k.push("ust"); k.push("a" + i, "r" + i); });
-    if (t.schwelle) k.push("laden");
     return k;
   }
   function isFilled(i) { return fieldKeys(S.tasks[i]).every(k => (S.answers[i][k] || "").trim() !== ""); }
