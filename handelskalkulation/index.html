@@ -560,7 +560,7 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
   }
 
   function startLevel(n) {
-    if (!unlocked(n) || !BRANCH_KEYS.includes(PROG.branch)) return;
+    if (!unlocked(n) || !BRANCH_KEYS.includes(PROG.branch) || !PROG.name) return;
     S = { screen: "task", level: n, tasks: makeRound(n, PROG.branch), answers: [], idx: 0, help: false, warn: false, result: null };
     S.answers = S.tasks.map(() => ({}));
     render();
@@ -579,9 +579,23 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
         <p><span class="muted">Typische Werte:</span> Rabatt ${span(B.rabatt)}, Skonto ${span(B.skonto)}, Handlungskosten ${span(B.hk)}, Gewinn ${span(B.gewinn)}, Umsatzsteuer ${k === "lm" ? "7 % (Lebensmittel) oder 19 % (Getränke)" : "19 %"}</p></div>`;
     }).join("")}</div>`;
   }
+  function startLabel(n, open, done) {
+    if (!open) return "Gesperrt";
+    if (!PROG.name) return "Erst Vornamen eingeben";
+    if (!BRANCH_KEYS.includes(PROG.branch)) return "Erst Betrieb wählen";
+    return done ? "Wiederholen" : "Stufe " + n + " üben";
+  }
+  function updateStartButtons() {
+    const ready = !!PROG.name && BRANCH_KEYS.includes(PROG.branch);
+    app.querySelectorAll("[data-start][data-open]").forEach(b => {
+      const open = b.dataset.open === "true";
+      b.disabled = !(open && ready);
+      b.textContent = startLabel(+b.dataset.start, open, b.dataset.done === "true");
+    });
+    const h = document.getElementById("need-name"); if (h) h.hidden = !!PROG.name;
+  }
   function renderHome() {
     const br = PROG.branch;
-    const chosen = BRANCH_KEYS.includes(br);
     const cards = LEVELS.map(L => {
       const open = unlocked(L.n), done = !!PROG.passed[L.n], best = PROG.best[L.n];
       let status;
@@ -594,7 +608,7 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
         <h3>${L.title}</h3>
         <ul>${L.items.map(i => `<li>${i}</li>`).join("")}<li>${L.tasks} Aufgaben je Runde</li></ul>
         <div class="foot"><span class="muted" style="font-size:.9rem">Bestanden ab ${PASS} %</span>
-        <button class="btn${done ? " ghost" : ""}" data-start="${L.n}" ${open && chosen ? "" : "disabled"}>${!open ? "Gesperrt" : !chosen ? "Erst Betrieb wählen" : done ? "Wiederholen" : "Stufe " + L.n + " üben"}</button></div>
+        <button class="btn${done ? " ghost" : ""}" data-start="${L.n}" data-open="${open}" data-done="${done}">${startLabel(L.n, open, done)}</button></div>
       </article>`;
     }).join("");
 
@@ -605,12 +619,13 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
         <p class="lead">Üben Sie die Vorwärtskalkulation: vom Angebot des Lieferers bis zum Preis im Regal. Füllen Sie das Kalkulationsblatt aus. Am Ende sehen Sie Ihre Fehler und was Sie noch üben sollten.</p>
       </div>
       <div class="setup">
-        <div class="grp"><label for="name">Ihr Name (optional)</label><input id="name" type="text" autocomplete="given-name" maxlength="40" value="${esc(PROG.name || "")}" placeholder="z. B. Lena Schmidt"></div>
+        <div class="grp"><label for="name">Ihr Vorname (Pflichtfeld)</label><input id="name" type="text" autocomplete="given-name" maxlength="40" required aria-required="true" value="${esc(PROG.name || "")}" placeholder="z. B. Lena"></div>
         <div class="grp"><span class="lab" id="br-lab">Waren aus Ihrem Ausbildungsbetrieb</span>
           <div class="seg" role="group" aria-labelledby="br-lab">
             ${[["lm", "Lebensmittel"], ["bk", "Bekleidung"], ["mix", "Gemischt"]].map(([k, l]) => `<button data-branch="${k}" aria-pressed="${br === k}">${l}</button>`).join("")}
           </div></div>
       </div>
+      <p class="pick-hint" id="need-name"${PROG.name ? " hidden" : ""}>Bitte geben Sie zuerst Ihren Vornamen ein. Er steht auf Ihrem Ergebnis.</p>
       ${branchInfo(br)}
       <div class="levels">${cards}</div>
       <div class="info">
@@ -632,6 +647,7 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
         : `<button class="linkbtn" data-act="reset">Fortschritt zurücksetzen</button>`}
         ${teacher() ? `<span class="chip ok">Lehrkraft-Ansicht: alle Stufen offen</span>` : ""}</div>
     </section>`;
+    updateStartButtons();
   }
 
   function exampleSchema(br) {
@@ -825,7 +841,7 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
 
   app.addEventListener("input", e => {
     const el = e.target;
-    if (el.id === "name") { PROG.name = el.value.trim(); saveProgress(); return; }
+    if (el.id === "name") { PROG.name = el.value.trim(); saveProgress(); updateStartButtons(); return; }
     if (el.dataset.k && S.screen === "task") { S.answers[S.idx][el.dataset.k] = el.value; refreshReady(el); }
   });
   function refreshReady(el) {

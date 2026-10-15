@@ -56,7 +56,7 @@ Szenarien stehen im Array `SCENARIOS` in `verkaufsgespraech.html`. Jedes Szenari
 
 # Kalkulationstrainer Einzelhandel (Handelskalkulation)
 
-Online-Übung zur Vorwärtskalkulation für Verkäuferinnen und Verkäufer im 2. Ausbildungsjahr (NRW). Die Waren stammen aus den Ausbildungsbetrieben Lebensmittel (Frischemarkt Kortmann) und Bekleidung (Modehaus Brüggemann). Auf der Startseite wählen die Schülerinnen und Schüler zuerst ihren Ausbildungsbetrieb (Lebensmittel, Bekleidung oder Gemischt); vorher lässt sich keine Stufe starten. Artikel, Rabatte, Zuschläge, Steuersätze und das Beispielschema richten sich nach dieser Wahl.
+Online-Übung zur Vorwärtskalkulation für Verkäuferinnen und Verkäufer im 2. Ausbildungsjahr (NRW). Die Waren stammen aus den Ausbildungsbetrieben Lebensmittel (Frischemarkt Kortmann) und Bekleidung (Modehaus Brüggemann). Auf der Startseite geben die Schülerinnen und Schüler zuerst ihren Vornamen ein (Pflichtfeld, steht auf dem Ergebnis) und wählen ihren Ausbildungsbetrieb (Lebensmittel, Bekleidung oder Gemischt); vorher lässt sich keine Stufe starten. Artikel, Rabatte, Zuschläge, Steuersätze und das Beispielschema richten sich nach dieser Wahl.
 
 ## Stufen
 
