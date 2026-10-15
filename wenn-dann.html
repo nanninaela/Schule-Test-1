@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wenn-dann-Sätze</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&display=swap">
+<style>
+/* Layout: eine schmale Spalte für Smartphones. Kopf mit Fortschritt, darunter eine Aufgabenkarte, unten der Prüfen-Knopf. */
+:root {
+  --paper: #f4f2ee;
+  --surface: #ffffff;
+  --ink: #1b2230;
+  --muted: #5d6675;
+  --line: #dcd8d0;
+  --accent: #2346a0;
+  --accent-ink: #ffffff;
+  --accent-soft: #e3e9f8;
+  --wenn: #8a3fb0;
+  --wenn-soft: #f2e6f8;
+  --dann: #0f7b72;
+  --dann-soft: #dcf2ef;
+  --good: #1d7a4c;
+  --good-soft: #def2e7;
+  --bad: #b5352a;
+  --bad-soft: #f8e1de;
+  --shadow: 0 1px 2px rgba(27,34,48,.06), 0 6px 18px rgba(27,34,48,.07);
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #14171d; --surface: #1d222b; --ink: #e9ecf1; --muted: #9ba5b4; --line: #2e3540;
+    --accent: #84a1f2; --accent-ink: #0f1420; --accent-soft: #24304a;
+    --wenn: #d29af0; --wenn-soft: #35243f; --dann: #5fd0c3; --dann-soft: #173431;
+    --good: #62cf95; --good-soft: #17322a; --bad: #f08a7e; --bad-soft: #3a1f1c;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.25);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #14171d; --surface: #1d222b; --ink: #e9ecf1; --muted: #9ba5b4; --line: #2e3540;
+  --accent: #84a1f2; --accent-ink: #0f1420; --accent-soft: #24304a;
+  --wenn: #d29af0; --wenn-soft: #35243f; --dann: #5fd0c3; --dann-soft: #173431;
+  --good: #62cf95; --good-soft: #17322a; --bad: #f08a7e; --bad-soft: #3a1f1c;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.25);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 1.125rem;
+  line-height: 1.5;
+}
+[hidden] { display: none !important; }
+button { font: inherit; color: inherit; }
+.wrap { max-width: 640px; margin: 0 auto; padding: 16px 16px 120px; }
+
+h1, h2 { font-family: var(--f-display); line-height: 1.15; margin: 0; }
+h1 { font-size: 1.75rem; font-weight: 800; }
+h2 { font-size: 1.25rem; font-weight: 700; }
+.muted { color: var(--muted); }
+.w { color: var(--wenn); font-weight: 700; }
+.d { color: var(--dann); font-weight: 700; }
+.v { text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 4px; font-weight: 700; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+  margin-top: 16px;
+}
+
+/* Start */
+.rule { display: grid; gap: 10px; margin-top: 12px; }
+.rule .ex {
+  border-radius: 12px; padding: 12px 14px; font-size: 1.15rem;
+  background: var(--paper);
+}
+.rule ol { margin: 8px 0 0; padding-left: 1.3em; }
+.rule li { margin: 4px 0; }
+.levels { display: grid; gap: 8px; margin-top: 12px; padding: 0; list-style: none; }
+.levels li { display: flex; gap: 10px; align-items: baseline; }
+.stars { color: #c98a00; letter-spacing: 1px; white-space: nowrap; min-width: 3.6em; }
+
+/* Kopf während der Übung */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .9rem; font-weight: 700; padding: 4px 10px; border-radius: 999px;
+  background: var(--accent-soft); color: var(--accent);
+}
+.dots { display: flex; gap: 5px; margin-top: 12px; flex-wrap: wrap; }
+.dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--line); background: var(--surface); }
+.dot.now { border-color: var(--accent); }
+.dot.ok { background: var(--good); border-color: var(--good); }
+.dot.no { background: var(--bad); border-color: var(--bad); }
+
+.task-emoji { font-size: 2.6rem; line-height: 1; }
+.task-head { display: flex; gap: 14px; align-items: center; }
+.instr { margin: 0; font-weight: 700; }
+
+/* Wörter ordnen */
+.answer {
+  min-height: 64px; margin-top: 16px; padding: 10px;
+  border: 2px dashed var(--line); border-radius: 12px;
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+}
+.answer.empty::before { content: "Tippe die Wörter in der richtigen Reihenfolge an."; color: var(--muted); font-size: .95rem; }
+.pool { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+.tile {
+  border: 2px solid var(--line); background: var(--surface);
+  border-radius: 10px; padding: 8px 12px; min-height: 44px; min-width: 44px;
+  font-size: 1.1rem; cursor: pointer;
+  transition: transform .12s ease;
+}
+.tile:active { transform: scale(.96); }
+.tile.wenn { border-color: var(--wenn); }
+.tile.comma { font-weight: 700; min-width: 44px; }
+.tile.right { background: var(--good-soft); border-color: var(--good); }
+.tile.wrong { background: var(--bad-soft); border-color: var(--bad); }
+.tile.used { visibility: hidden; }
+
+/* Auswahl */
+.given { margin-top: 14px; font-size: 1.2rem; }
+.gap {
+  display: inline-block; min-width: 4.5em; border-bottom: 3px solid var(--accent);
+  text-align: center; font-weight: 700; color: var(--accent);
+}
+.choices { display: grid; gap: 10px; margin-top: 16px; }
+.choice {
+  text-align: left; border: 2px solid var(--line); background: var(--surface);
+  border-radius: 12px; padding: 12px 14px; min-height: 52px; cursor: pointer; font-size: 1.1rem;
+}
+.choice.sel { border-color: var(--accent); background: var(--accent-soft); }
+.choice.right { border-color: var(--good); background: var(--good-soft); }
+.choice.wrong { border-color: var(--bad); background: var(--bad-soft); }
+.choices.row { grid-template-columns: repeat(3, 1fr); }
+.choices.row .choice { text-align: center; }
+
+/* Rückmeldung */
+.fb { margin-top: 16px; border-radius: 12px; padding: 12px 14px; }
+.fb.ok { background: var(--good-soft); }
+.fb.no { background: var(--bad-soft); }
+.fb b { display: block; }
+.fb .sol { margin-top: 6px; font-size: 1.15rem; }
+
+.tools { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+.link-btn {
+  background: none; border: 0; padding: 8px 0; color: var(--accent);
+  font-weight: 700; cursor: pointer; text-decoration: underline; text-underline-offset: 3px;
+}
+
+/* Knopfleiste unten */
+.bar {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid var(--line);
+}
+.bar-in { max-width: 640px; margin: 0 auto; display: flex; gap: 10px; }
+.btn {
+  flex: 1; border: 0; border-radius: 12px; min-height: 52px; padding: 0 18px;
+  background: var(--accent); color: var(--accent-ink); font-weight: 700; font-size: 1.1rem; cursor: pointer;
+}
+.btn.ghost { background: var(--surface); color: var(--ink); border: 2px solid var(--line); flex: 0 0 auto; }
+.btn:disabled { opacity: .45; cursor: default; }
+
+/* Ergebnis */
+.score { font-family: var(--f-display); font-size: 3.2rem; font-weight: 800; line-height: 1; margin-top: 8px; }
+.list { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 8px; }
+.list li { display: flex; gap: 10px; align-items: flex-start; font-size: 1rem; }
+.list .mark { flex: 0 0 auto; width: 1.4em; text-align: center; font-weight: 700; }
+.list .mark.ok { color: var(--good); }
+.list .mark.no { color: var(--bad); }
+
+@media (prefers-reduced-motion: reduce) { .tile { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Startseite -->
+  <section id="start">
+    <p class="badge">Deutsch A2</p>
+    <h1 style="margin-top:10px">Wenn-dann-Sätze</h1>
+    <p class="muted" style="margin:6px 0 0">15 Aufgaben. Zuerst schwer, dann leichter.</p>
+
+    <div class="card rule">
+      <h2>So geht’s</h2>
+      <div class="ex"><span class="w">Wenn</span> ich Zeit <span class="v w">habe</span>, <span class="d">dann</span> <span class="v d">gehe</span> ich ins Kino.</div>
+      <ol>
+        <li>Im <span class="w">Wenn-Teil</span> steht das Verb am <b>Ende</b>.</li>
+        <li>Dann kommt ein <b>Komma</b> ( , ).</li>
+        <li>Nach <span class="d">dann</span> kommt sofort das <b>Verb</b>.</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h2>Drei Stufen</h2>
+      <ul class="levels">
+        <li><span class="stars">★★★</span><span><b>1 bis 5:</b> Bring alle Wörter in die richtige Reihenfolge.</span></li>
+        <li><span class="stars">★★☆</span><span><b>6 bis 10:</b> Welcher Dann-Teil ist richtig?</span></li>
+        <li><span class="stars">★☆☆</span><span><b>11 bis 15:</b> Welches Wort fehlt?</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Übung -->
+  <section id="quiz" hidden>
+    <div class="top">
+      <span class="badge" id="level"></span>
+      <span class="muted" id="count"></span>
+    </div>
+    <div class="dots" id="dots" aria-hidden="true"></div>
+
+    <div class="card">
+      <div class="task-head">
+        <div class="task-emoji" id="emoji" aria-hidden="true"></div>
+        <p class="instr" id="instr"></p>
+      </div>
+      <div id="body"></div>
+      <div id="fb" class="fb" hidden aria-live="polite"></div>
+      <div class="tools">
+        <button class="link-btn" id="tipBtn" type="button">Tipp</button>
+        <button class="link-btn" id="speakBtn" type="button" hidden>🔊 Satz anhören</button>
+      </div>
+      <p id="tip" class="muted" hidden style="margin:4px 0 0"></p>
+    </div>
+  </section>
+
+  <!-- Ergebnis -->
+  <section id="result" hidden>
+    <h1>Geschafft!</h1>
+    <div class="card">
+      <p class="muted" style="margin:0">Deine Punkte</p>
+      <div class="score" id="score"></div>
+      <p id="praise" style="margin:10px 0 0"></p>
+    </div>
+    <div class="card">
+      <h2>Alle Sätze</h2>
+      <ul class="list" id="summary"></ul>
+    </div>
+  </section>
+
+</div>
+
+<div class="bar">
+  <div class="bar-in">
+    <button class="btn ghost" id="backBtn" type="button" hidden aria-label="Zurück">←</button>
+    <button class="btn" id="mainBtn" type="button">Los geht’s</button>
+  </div>
+</div>
+
+<script>
+/* Aufgaben: von schwer (1) nach leicht (15).
+   order:  t = Wörter/Wortgruppen in richtiger Reihenfolge. Der Punkt am Ende ist fest.
+   pick:   wenn = gegebener Wenn-Teil, o = Antworten, die erste ist richtig, why = Erklärung für die falschen.
+   gap:    s = Satz mit ___ als Lücke, o = Wörter, das erste ist richtig. */
+var TASKS = [
+  { type: "order", e: "⏰", t: ["Wenn", "ich", "früh", "aufstehe", ",", "dann", "kann", "ich", "den Bus", "nehmen"],
+    tip: "„kann“ steht direkt nach „dann“. „nehmen“ steht ganz am Ende." },
+  { type: "order", e: "🤒", t: ["Wenn", "du", "krank", "bist", ",", "dann", "musst", "du", "zum Arzt", "gehen"],
+    tip: "„bist“ steht am Ende vom Wenn-Teil. Nach „dann“ kommt „musst“." },
+  { type: "order", e: "🌧️", t: ["Wenn", "es", "am Wochenende", "regnet", ",", "dann", "bleiben", "wir", "zu Hause"],
+    tip: "„regnet“ steht am Ende vom Wenn-Teil." },
+  { type: "order", e: "📞", t: ["Wenn", "die Schule", "aus", "ist", ",", "dann", "rufe", "ich", "meine Mutter", "an"],
+    tip: "„anrufen“ ist trennbar: „rufe“ kommt nach „dann“, „an“ steht ganz am Ende." },
+  { type: "order", e: "📱", t: ["Wenn", "ich", "mehr Geld", "habe", ",", "dann", "kaufe", "ich", "ein neues Handy"],
+    tip: "Wenn-Teil: Verb am Ende. Dann-Teil: dann + Verb + ich." },
+
+  { type: "pick", e: "🍞", wenn: "Wenn ich Hunger habe,",
+    o: ["dann esse ich ein Brot.", "dann ich esse ein Brot.", "dann ziehe ich eine Jacke an."],
+    why: ["", "Nach „dann“ kommt zuerst das Verb: dann esse ich.", "Das passt nicht zu Hunger."],
+    tip: "Nach „dann“ kommt sofort das Verb. Und der Satz muss passen." },
+  { type: "pick", e: "🧥", wenn: "Wenn es kalt ist,",
+    o: ["dann ziehe ich eine Jacke an.", "dann ich ziehe eine Jacke an.", "dann esse ich ein Eis."],
+    why: ["", "Nach „dann“ kommt zuerst das Verb: dann ziehe ich.", "Ein Eis, wenn es kalt ist? Das passt nicht gut."],
+    tip: "Was macht man, wenn es kalt ist?" },
+  { type: "pick", e: "🚌", wenn: "Wenn der Bus nicht kommt,",
+    o: ["dann gehe ich zu Fuß.", "dann zu Fuß ich gehe.", "dann bin ich sehr pünktlich."],
+    why: ["", "Das Verb „gehe“ muss direkt nach „dann“ stehen.", "Ohne Bus ist man meistens nicht pünktlich."],
+    tip: "Das Verb steht direkt nach „dann“." },
+  { type: "pick", e: "🙋", wenn: "Wenn du eine Frage hast,",
+    o: ["dann hilft dir die Lehrerin.", "dann die Lehrerin hilft dir.", "dann ist die Schule geschlossen."],
+    why: ["", "Nach „dann“ kommt zuerst das Verb: dann hilft.", "Das passt nicht zu einer Frage."],
+    tip: "Wer hilft bei einer Frage? Und wo steht das Verb?" },
+  { type: "pick", e: "🎉", wenn: "Wenn wir die Prüfung bestehen,",
+    o: ["dann feiern wir eine Party.", "dann wir feiern eine Party.", "dann müssen wir die Prüfung noch einmal machen."],
+    why: ["", "Nach „dann“ kommt zuerst das Verb: dann feiern wir.", "Wer die Prüfung besteht, muss sie nicht noch einmal machen."],
+    tip: "„bestehen“ heißt: Die Prüfung ist gut gegangen." },
+
+  { type: "gap", e: "😴", s: "Wenn ich müde ___, dann gehe ich ins Bett.", o: ["bin", "bist", "ist"],
+    tip: "ich bin, du bist, er ist" },
+  { type: "gap", e: "☀️", s: "Wenn die Sonne scheint, dann ___ wir in den Park.", o: ["gehen", "geht", "gehst"],
+    tip: "wir gehen, ihr geht, du gehst" },
+  { type: "gap", e: "☂️", s: "___ es regnet, dann nehme ich einen Regenschirm.", o: ["Wenn", "Dann", "Und"],
+    tip: "Der erste Teil beginnt mit …" },
+  { type: "gap", e: "💧", s: "Wenn ich Durst habe, ___ trinke ich Wasser.", o: ["dann", "wenn", "aber"],
+    tip: "Wenn …, ___ …" },
+  { type: "gap", e: "🏠", s: "Wenn ich krank bin, dann ___ ich zu Hause.", o: ["bleibe", "bleibst", "bleibt"],
+    tip: "ich bleibe, du bleibst, er bleibt" }
+];
+
+var LEVELS = { order: "★★★ schwer", pick: "★★☆ mittel", gap: "★☆☆ leicht" };
+var INSTR = {
+  order: "Bring die Wörter in die richtige Reihenfolge.",
+  pick: "Welcher Dann-Teil ist richtig?",
+  gap: "Welches Wort fehlt?"
+};
+
+var $ = function (id) { return document.getElementById(id); };
+var idx = 0;
+var state = [];   // pro Aufgabe: { tries, done, ok, picked: [...] , choice }
+var tryCount = 0;
+
+function sentenceOf(t) {
+  if (t.type === "order") return joinTiles(t.t) + ".";
+  if (t.type === "pick") return t.wenn + " " + t.o[0];
+  return t.s.replace("___", t.o[0]);
+}
+function joinTiles(arr) {
+  return arr.join(" ").replace(/ ,/g, ",");
+}
+function shuffle(a) {
+  a = a.slice();
+  for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var x = a[i]; a[i] = a[j]; a[j] = x; }
+  return a;
+}
+function shuffledIndexes(n) {
+  var base = [], i;
+  for (i = 0; i < n; i++) base.push(i);
+  var s;
+  do { s = shuffle(base); } while (s.every(function (v, k) { return v === k; }));
+  return s;
+}
+function esc(s) {
+  return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; });
+}
+
+function initState() {
+  state = TASKS.map(function (t) {
+    return {
+      done: false, ok: false, tries: 0,
+      order: t.type === "order" ? shuffledIndexes(t.t.length) : shuffledIndexes(t.o.length),
+      picked: [], choice: -1
+    };
+  });
+}
+
+function show(which) {
+  ["start", "quiz", "result"].forEach(function (id) { $(id).hidden = id !== which; });
+  window.scrollTo(0, 0);
+}
+
+function renderDots() {
+  $("dots").innerHTML = TASKS.map(function (t, i) {
+    var c = "dot";
+    if (state[i].done) c += state[i].ok ? " ok" : " no";
+    if (i === idx) c += " now";
+    return '<span class="' + c + '"></span>';
+  }).join("");
+}
+
+function render() {
+  var t = TASKS[idx], st = state[idx];
+  $("level").textContent = LEVELS[t.type];
+  $("count").textContent = "Satz " + (idx + 1) + " von " + TASKS.length;
+  $("emoji").textContent = t.e;
+  $("instr").textContent = INSTR[t.type];
+  $("tip").hidden = true;
+  $("tip").textContent = "Tipp: " + t.tip;
+  $("tipBtn").hidden = st.done;
+  $("speakBtn").hidden = !(st.done && "speechSynthesis" in window);
+  $("backBtn").hidden = idx === 0;
+  renderDots();
+
+  var b = $("body");
+  if (t.type === "order") {
+    var html = '<div class="answer' + (st.picked.length ? "" : " empty") + '" id="answer">';
+    st.picked.forEach(function (ti, pos) {
+      var cls = "tile" + (t.t[ti] === "," ? " comma" : "");
+      if (st.done || st.marked) cls += (st.picked[pos] !== undefined && t.t[ti] === t.t[pos]) ? " right" : (st.marked ? " wrong" : "");
+      html += '<button type="button" class="' + cls + '" data-pos="' + pos + '"' + (st.done ? " disabled" : "") + '>' + esc(t.t[ti]) + '</button>';
+    });
+    html += '<span aria-hidden="true">.</span></div><div class="pool">';
+    st.order.forEach(function (ti) {
+      var used = st.picked.indexOf(ti) !== -1;
+      html += '<button type="button" class="tile' + (t.t[ti] === "," ? " comma" : "") + (used ? " used" : "") + '" data-ti="' + ti + '"' + (used || st.done ? " disabled tabindex=\"-1\"" : "") + '>' + esc(t.t[ti]) + '</button>';
+    });
+    html += "</div>";
+    b.innerHTML = html;
+  } else if (t.type === "pick") {
+    var h = '<p class="given"><span class="w">' + esc(t.wenn) + '</span> …</p><div class="choices">';
+    st.order.forEach(function (oi) { h += choiceBtn(st, oi, t.o[oi]); });
+    b.innerHTML = h + "</div>";
+  } else {
+    var shown = st.done ? t.o[0] : (st.choice >= 0 ? t.o[st.choice] : "");
+    var parts = t.s.split("___");
+    var g = '<p class="given">' + esc(parts[0]) + '<span class="gap">' + (shown ? esc(shown) : "&nbsp;") + '</span>' + esc(parts[1]) + '</p><div class="choices row">';
+    st.order.forEach(function (oi) { g += choiceBtn(st, oi, t.o[oi]); });
+    b.innerHTML = g + "</div>";
+  }
+  renderFeedback();
+  updateMain();
+}
+
+function choiceBtn(st, oi, label) {
+  var cls = "choice";
+  if (st.done) { if (oi === 0) cls += " right"; else if (oi === st.choice) cls += " wrong"; }
+  else if (oi === st.choice) cls += " sel";
+  return '<button type="button" class="' + cls + '" data-oi="' + oi + '"' + (st.done ? " disabled" : "") + ' aria-pressed="' + (oi === st.choice) + '">' + esc(label) + '</button>';
+}
+
+function renderFeedback() {
+  var t = TASKS[idx], st = state[idx], fb = $("fb");
+  if (!st.msg) { fb.hidden = true; return; }
+  fb.hidden = false;
+  fb.className = "fb " + (st.msg.ok ? "ok" : "no");
+  fb.innerHTML = "<b>" + esc(st.msg.title) + "</b>" + (st.msg.text ? "<span>" + esc(st.msg.text) + "</span>" : "") +
+    (st.done ? '<div class="sol">' + esc(sentenceOf(t)) + "</div>" : "");
+}
+
+function canCheck() {
+  var t = TASKS[idx], st = state[idx];
+  if (t.type === "order") return st.picked.length === t.t.length;
+  return st.choice >= 0;
+}
+
+function updateMain() {
+  var st = state[idx], m = $("mainBtn");
+  if (st.done) { m.textContent = idx === TASKS.length - 1 ? "Ergebnis ansehen" : "Weiter →"; m.disabled = false; }
+  else { m.textContent = "Prüfen"; m.disabled = !canCheck(); }
+}
+
+var PRAISE = ["Super!", "Richtig!", "Sehr gut!", "Toll!", "Genau!"];
+
+function check() {
+  var t = TASKS[idx], st = state[idx];
+  st.tries++;
+  var correct;
+  if (t.type === "order") {
+    correct = st.picked.every(function (ti, pos) { return t.t[ti] === t.t[pos]; });
+  } else {
+    correct = st.choice === 0;
+  }
+  if (correct) {
+    st.done = true; st.ok = st.tries === 1 ? 2 : 1;
+    st.msg = { ok: true, title: PRAISE[Math.floor(Math.random() * PRAISE.length)], text: st.tries === 1 ? "" : "Beim zweiten Versuch geschafft." };
+    speak(sentenceOf(t));
+  } else if (st.tries >= 2) {
+    st.done = true; st.ok = 0;
+    st.msg = { ok: false, title: "Leider falsch. So ist es richtig:", text: t.type === "pick" ? t.why[st.choice] : "" };
+  } else {
+    st.marked = t.type === "order";
+    var text = t.type === "pick" ? t.why[st.choice] : (t.type === "order" ? "Die roten Wörter stehen falsch. Tippe sie an und versuch es noch einmal." : "Lies den Tipp und versuch es noch einmal.");
+    st.msg = { ok: false, title: "Noch nicht ganz.", text: text };
+    if (t.type !== "pick") $("tip").hidden = false;
+    if (t.type === "gap") st.choice = -1;
+    if (t.type === "pick") st.choice = -1;
+  }
+  var tipWasOpen = !$("tip").hidden;
+  render();
+  if (!st.done && tipWasOpen) $("tip").hidden = false;
+}
+
+function speak(text) {
+  if (!("speechSynthesis" in window)) return;
+  try {
+    speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = "de-DE"; u.rate = 0.85;
+    var v = speechSynthesis.getVoices().filter(function (x) { return /^de/i.test(x.lang); })[0];
+    if (v) u.voice = v;
+    speechSynthesis.speak(u);
+  } catch (e) {}
+}
+
+function points() {
+  return state.reduce(function (s, x) { return s + (x.ok || 0); }, 0);
+}
+
+function showResult() {
+  var p = points(), max = TASKS.length * 2;
+  $("score").textContent = p + " / " + max;
+  var r = p / max;
+  $("praise").textContent = r >= 0.85 ? "Ausgezeichnet! Du kannst Wenn-dann-Sätze sehr gut." :
+    r >= 0.6 ? "Gut gemacht! Übe die schweren Sätze noch einmal." :
+    "Du bist auf dem Weg. Lies „So geht’s“ und versuch es noch einmal.";
+  $("summary").innerHTML = TASKS.map(function (t, i) {
+    var ok = state[i].ok > 0;
+    return '<li><span class="mark ' + (ok ? "ok" : "no") + '">' + (ok ? "✓" : "✗") + "</span><span>" + esc(sentenceOf(t)) + "</span></li>";
+  }).join("");
+  $("mainBtn").textContent = "Noch einmal üben";
+  $("mainBtn").disabled = false;
+  $("backBtn").hidden = true;
+  show("result");
+}
+
+var screen = "start";
+
+$("mainBtn").addEventListener("click", function () {
+  if (screen === "start" || screen === "result") {
+    initState(); idx = 0; screen = "quiz"; show("quiz"); render(); return;
+  }
+  var st = state[idx];
+  if (!st.done) { check(); return; }
+  if (idx < TASKS.length - 1) { idx++; render(); window.scrollTo(0, 0); }
+  else { screen = "result"; showResult(); }
+});
+
+$("backBtn").addEventListener("click", function () {
+  if (idx > 0) { idx--; render(); window.scrollTo(0, 0); }
+});
+
+$("tipBtn").addEventListener("click", function () { $("tip").hidden = !$("tip").hidden; });
+$("speakBtn").addEventListener("click", function () { speak(sentenceOf(TASKS[idx])); });
+
+$("body").addEventListener("click", function (ev) {
+  var btn = ev.target.closest("button");
+  if (!btn || btn.disabled) return;
+  var t = TASKS[idx], st = state[idx];
+  if (st.done) return;
+  if (btn.hasAttribute("data-ti")) {
+    st.picked.push(+btn.getAttribute("data-ti"));
+    st.marked = false;
+  } else if (btn.hasAttribute("data-pos")) {
+    st.picked.splice(+btn.getAttribute("data-pos"), 1);
+    st.marked = false;
+  } else if (btn.hasAttribute("data-oi")) {
+    st.choice = +btn.getAttribute("data-oi");
+  } else return;
+  var tipOpen = !$("tip").hidden;
+  if (t.type !== "order" || !st.marked) st.msg = st.msg && !st.msg.ok ? st.msg : null;
+  render();
+  if (tipOpen) $("tip").hidden = false;
+});
+</script>
+</body>
+</html>

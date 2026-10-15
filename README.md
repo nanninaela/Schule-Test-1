@@ -53,3 +53,15 @@ Die Bestwerte pro Szenario werden nur im Browser der jeweiligen Person gespeiche
 ## Neue Szenarien ergänzen
 
 Szenarien stehen im Array `SCENARIOS` in `verkaufsgespraech.html`. Jedes Szenario braucht 8 Schritte in der Reihenfolge der Phasen. Jeder Schritt hat drei Antworten mit `s` = 2, 1 und 0 Punkten. Danach `./build.sh` ausführen.
+
+## Übung: Wenn-dann-Sätze (Deutsch A2)
+
+`wenn-dann.html` ist eine Übungsseite für Smartphones (Internationale Förderklasse, Niveau A2). 15 Sätze, von schwer nach leicht:
+
+- **1 bis 5 (schwer):** alle Wörter eines Wenn-dann-Satzes in die richtige Reihenfolge bringen (mit Komma, Modalverben, trennbarem Verb)
+- **6 bis 10 (mittel):** den richtigen Dann-Teil auswählen (Wortstellung und Bedeutung)
+- **11 bis 15 (leicht):** das fehlende Wort einsetzen
+
+Jede Aufgabe hat einen Tipp und zwei Versuche (2 Punkte beim ersten, 1 Punkt beim zweiten Versuch). Richtige Sätze werden vorgelesen. Am Ende gibt es eine Übersicht aller Sätze.
+
+**QR-Code:** `wenn-dann-qr.png` (zum Drucken) und `wenn-dann-qr.html` (zum Zeigen am Beamer). Er führt zu `https://nanninaela.github.io/Schule-Test-1/wenn-dann.html`. Dafür muss GitHub Pages eingeschaltet sein: im Repository unter **Settings → Pages → Build and deployment** „Deploy from a branch“ wählen, den Branch mit der Datei auswählen, Ordner `/ (root)`, speichern.
