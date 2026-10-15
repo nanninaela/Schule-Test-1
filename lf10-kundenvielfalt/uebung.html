@@ -1,0 +1,636 @@
+<title>Kundenvielfalt LF 10</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: schmale Handy-Spalte. Start = Stationenliste wie ein Laufzettel, Station = Wissenskarten, dann eine Aufgabe pro Bildschirm mit fester Weiter-Leiste unten, Ende = Nachweis zum Abfotografieren */
+:root {
+  --paper: #f2f4f6;
+  --surface: #ffffff;
+  --ink: #18202b;
+  --muted: #5b6676;
+  --line: #d9dee5;
+  --accent: #2346a0;
+  --accent-ink: #ffffff;
+  --accent-soft: #e3e9f8;
+  --good: #1d7a4c;
+  --good-soft: #def2e7;
+  --ok: #9a6400;
+  --ok-soft: #fbefd6;
+  --bad: #b5352a;
+  --bad-soft: #f8e1de;
+  --shadow: 0 1px 2px rgba(24, 32, 43, .06), 0 6px 18px rgba(24, 32, 43, .06);
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #12161c; --surface: #1b212a; --ink: #e8ecf2; --muted: #9aa5b5; --line: #2c3440;
+    --accent: #7d9bf0; --accent-ink: #0f1420; --accent-soft: #232d45;
+    --good: #5fcf94; --good-soft: #17322a; --ok: #e7b45a; --ok-soft: #352a14; --bad: #f08a7e; --bad-soft: #3a1f1c;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.25);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #12161c; --surface: #1b212a; --ink: #e8ecf2; --muted: #9aa5b5; --line: #2c3440;
+  --accent: #7d9bf0; --accent-ink: #0f1420; --accent-soft: #232d45;
+  --good: #5fcf94; --good-soft: #17322a; --ok: #e7b45a; --ok-soft: #352a14; --bad: #f08a7e; --bad-soft: #3a1f1c;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.25);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.55;
+}
+.wrap {
+  max-width: 640px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 120px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: 2rem; font-weight: 800; letter-spacing: -.01em; }
+h2 { font-size: 1.45rem; font-weight: 800; }
+h3 { font-size: 1.1rem; font-weight: 600; }
+p { margin: 0; }
+.kicker { font-family: var(--f-mono); font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.muted { color: var(--muted); }
+.card { background: var(--surface); border-radius: 14px; padding: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.task { background: var(--accent-soft); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+.task ol { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 4px; }
+label.field { display: flex; flex-direction: column; gap: 6px; font-weight: 700; }
+input[type=text] {
+  font: inherit; padding: 12px 14px; border-radius: 10px; border: 1.5px solid var(--line);
+  background: var(--surface); color: var(--ink); width: 100%;
+}
+input[type=text]:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* Stationen */
+.stations { display: flex; flex-direction: column; gap: 10px; }
+.station {
+  display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center;
+  background: var(--surface); border: 0; border-radius: 14px; padding: 14px; box-shadow: var(--shadow);
+  font: inherit; color: inherit; text-align: left; cursor: pointer; width: 100%;
+}
+.station .num {
+  width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--accent-soft); color: var(--accent); font-family: var(--f-display); font-weight: 800; font-size: 1.2rem;
+}
+.station.done .num { background: var(--good-soft); color: var(--good); }
+.station .t { font-weight: 700; display: block; line-height: 1.3; }
+.station .s { font-size: .9rem; color: var(--muted); display: block; }
+.station .score { font-family: var(--f-mono); font-size: .85rem; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.station.done .score { color: var(--good); font-weight: 600; }
+
+/* Wissen */
+.facts { display: flex; flex-direction: column; gap: 12px; }
+.fact h3 { color: var(--accent); }
+.fact ul { margin: 0; padding-left: 1.15em; display: flex; flex-direction: column; gap: 4px; }
+.page { font-family: var(--f-mono); font-size: .78rem; color: var(--muted); }
+.term { background: var(--ok-soft); border-radius: 10px; padding: 10px 12px; font-size: .95rem; }
+.term b { color: var(--ok); }
+
+/* Aufgabe */
+.progress { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; }
+.progress i { display: block; height: 100%; background: var(--accent); border-radius: 99px; transition: width .3s; }
+.qhead { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.qtype { font-family: var(--f-mono); font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-variant-numeric: tabular-nums; }
+.quote { font-family: var(--f-display); font-size: 1.15rem; font-weight: 600; border-left: 0; background: var(--accent-soft); border-radius: 12px; padding: 12px 14px; }
+.opts { display: flex; flex-direction: column; gap: 10px; }
+.opt {
+  font: inherit; color: var(--ink); text-align: left; cursor: pointer;
+  background: var(--surface); border: 2px solid var(--line); border-radius: 12px; padding: 12px 14px; min-height: 52px;
+}
+.opt:hover:not(:disabled) { border-color: var(--accent); }
+.opt:disabled { cursor: default; }
+.opt.right { border-color: var(--good); background: var(--good-soft); }
+.opt.wrong { border-color: var(--bad); background: var(--bad-soft); }
+.opt.dim { opacity: .55; }
+.tf { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tf .opt { text-align: center; font-weight: 700; }
+
+.sort-item { background: var(--surface); border-radius: 12px; padding: 12px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 8px; }
+.sort-item.right { box-shadow: inset 0 0 0 2px var(--good); }
+.sort-item.wrong { box-shadow: inset 0 0 0 2px var(--bad); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  font: inherit; font-size: .9rem; cursor: pointer; color: var(--ink);
+  border: 1.5px solid var(--line); background: var(--paper); border-radius: 99px; padding: 6px 12px; min-height: 38px;
+}
+.chip.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.chip.should { border-color: var(--good); border-style: dashed; }
+.chip:disabled { cursor: default; }
+.fix { font-size: .88rem; color: var(--bad); font-weight: 700; }
+
+.feedback { border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+.feedback.good { background: var(--good-soft); }
+.feedback.bad { background: var(--bad-soft); }
+.feedback.mid { background: var(--ok-soft); }
+.feedback strong { font-family: var(--f-display); font-size: 1.1rem; }
+.feedback.good strong { color: var(--good); }
+.feedback.bad strong { color: var(--bad); }
+.feedback.mid strong { color: var(--ok); }
+
+/* Leiste unten */
+.bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
+  background: var(--surface); border-top: 1px solid var(--line);
+  padding-top: 12px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.bar-in { max-width: 640px; margin: 0 auto; display: flex; gap: 10px; }
+.btn {
+  font: inherit; font-weight: 700; cursor: pointer; border-radius: 12px; padding: 13px 18px; min-height: 50px;
+  border: 2px solid var(--accent); background: var(--accent); color: var(--accent-ink); flex: 1;
+}
+.btn.ghost { background: transparent; color: var(--accent); flex: 0 0 auto; }
+.btn:disabled { opacity: .45; cursor: default; }
+
+/* Ergebnis */
+.big { font-family: var(--f-display); font-weight: 800; font-size: 3rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.rows { display: flex; flex-direction: column; }
+.row { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px dashed var(--line); font-variant-numeric: tabular-nums; }
+.row:last-child { border-bottom: 0; }
+.row span:last-child { font-family: var(--f-mono); white-space: nowrap; }
+.row.text span:last-child { font-family: var(--f-body); font-weight: 700; white-space: normal; text-align: right; min-width: 0; overflow-wrap: anywhere; }
+.cert { border: 2px solid var(--accent); }
+.review ul { margin: 0; padding-left: 1.15em; display: flex; flex-direction: column; gap: 6px; }
+.note { font-size: .9rem; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .progress i { transition: none; } }
+</style>
+
+<div class="wrap" id="app"></div>
+<div class="bar" id="bar" hidden><div class="bar-in" id="barIn"></div></div>
+
+<script>
+(function () {
+  "use strict";
+  const STORE = "lf10-kundenvielfalt-v1";
+
+  // ---------------- Inhalte ----------------
+  // Aufgabentypen: mc (eine Antwort richtig, a = Index), tf (richtig/falsch), sort (Zuordnen, items: [Text, Kategorie-Index])
+  const STATIONS = [
+    {
+      title: "Kundengruppen, Frauen und Männer",
+      pages: "S. 168–170",
+      facts: [
+        { h: "Kundengruppen", p: "S. 168", list: [
+          "Kundengruppen werden nach demografischen Merkmalen gebildet: Geschlecht, Alter, Wohnort, geografische Herkunft, Einkommen, Familienstand und Haushaltsgröße.",
+          "Beispiel: Merkmal Familienstand → Single, Partnerschaft mit/ohne Kinder, Alleinerziehende.",
+          "Vorsicht: Ein einziges Merkmal reicht nicht für ein Kundenprofil. Man gerät schnell in ein Klischee."
+        ], term: ["Klischee", "eingefahrene Vorstellung, Verallgemeinerung, Vorurteil"] },
+        { h: "Frauen und Männer", p: "S. 168–169", list: [
+          "Rollenklischees wie „Frauen shoppen länger und geben mehr Geld aus“ sagen wenig. Es kommt auf die Gründe an, z. B. wer die Versorgungseinkäufe für die Familie erledigt.",
+          "Die Kaufkraft von Frauen ist gestiegen. Immer mehr Frauen kaufen Werkzeug, immer mehr Männer kaufen Haushaltsgeräte und Haarfärbemittel.",
+          "Umfrage 2023: Technische Neuheiten verfolgen 42,8 % der Männer, aber nur 18,5 % der Frauen. Im Internet kaufen beide gleich gern ein (39 % / 39,1 %)."
+        ], term: ["Gender-Marketing", "untersucht das geschlechtstypische Konsumverhalten und setzt gezielt Werbestrategien ein. Gender = soziales Geschlecht."] },
+        { h: "Tipps für das Verkaufsgespräch", p: "S. 169–170", list: [
+          "Kundinnen möchten oft umfassend informiert werden: fachlich fundiert beraten und die Ware testen lassen.",
+          "Kunden informieren sich oft vorab über technische Daten: Wissensstand früh feststellen, keinen Wettbewerb der „Besserwisserei“ beginnen.",
+          "Längst nicht jede Situation braucht ein geschlechtsspezifisches Vorgehen. Ordnen Sie Kundschaft nicht zwanghaft einer Gruppe zu."
+        ] }
+      ],
+      qs: [
+        { t: "mc", q: "Zu welchem demografischen Merkmal gehört die Kundengruppe „Alleinerziehende“?", o: ["Familienstand", "Einkommen", "Haushaltsgröße", "Wohnort"], a: 0, ex: "Beim Familienstand unterscheidet man Single, Partnerschaft mit oder ohne Kinder und Alleinerziehende.", p: "S. 168" },
+        { t: "mc", q: "Was ist ein Klischee?", o: ["Eine eingefahrene Vorstellung, eine Verallgemeinerung oder ein Vorurteil", "Eine wissenschaftlich belegte Kundenbefragung", "Ein besonders treuer Stammkunde", "Ein Rabatt für eine bestimmte Kundengruppe"], a: 0, ex: "Wer nur ein Merkmal betrachtet, landet schnell bei einem Klischee.", p: "S. 168" },
+        { t: "tf", q: "Ein einziges Merkmal, z. B. das Geschlecht, reicht aus, um ein Kundenprofil zu erstellen.", a: false, ex: "Ein einzelnes Merkmal ist für ein Kundenprofil problematisch, weil man leicht in Klischees denkt.", p: "S. 168" },
+        { t: "sort", q: "Ordnen Sie zu: Wer interessiert sich laut Buch immer mehr für …?", cats: ["Immer mehr Frauen", "Immer mehr Männer"], items: [
+          ["handliche Werkzeuge für Heimwerkerarbeiten", 0], ["einen leicht zu bedienenden Rasenmäher", 0], ["Möbel zum Selbstaufbauen", 0],
+          ["eine modische Frisur und Haarfärbemittel", 1], ["praktische Haushaltsgeräte zum Kochen", 1], ["freiverkäufliche Arzneimittel mit Beratung", 1]
+        ], ex: "Das geschlechtsspezifische Interesse an bestimmten Produkten hat sich verschoben.", p: "S. 169" },
+        { t: "mc", q: "Umfrage 2023: Wie viel Prozent der Männer versuchen, bei technischen Neuentwicklungen immer auf dem Laufenden zu bleiben?", o: ["42,8 %", "18,5 %", "57,8 %", "33,2 %"], a: 0, ex: "Bei den Frauen sind es nur 18,5 %.", p: "S. 169, Diagramm" },
+        { t: "mc", q: "Bei welcher Aussage gibt es zwischen Männern und Frauen fast keinen Unterschied?", o: ["„Ich kaufe gerne im Internet ein.“", "„Kleidung kaufen macht mir Spaß.“", "„Mit Kleidung drücke ich meinen Stil aus.“", "„Ich bleibe bei technischen Neuheiten auf dem Laufenden.“"], a: 0, ex: "Männer 39 %, Frauen 39,1 %.", p: "S. 169, Diagramm" },
+        { t: "mc", q: "Ein Kunde kennt die technischen Daten des Fernsehers schon genau. Wie gehen Sie vor?", o: ["Ich stelle frühzeitig seinen Wissensstand fest und vermeide einen Wettbewerb der „Besserwisserei“.", "Ich zähle ihm trotzdem alle technischen Daten auf, damit er mein Fachwissen sieht.", "Ich widerspreche ihm, damit er mir als Fachkraft vertraut.", "Ich spreche nur über den Preis."], a: 0, ex: "Stellen Sie nur die Produktvorteile heraus, die für die Bedürfnisse des Kunden wichtig sind.", p: "S. 170" },
+        { t: "mc", q: "Eine Kundin möchte eine teure Waschmaschine kaufen und ist eher kritisch. Was hilft laut Buch?", o: ["Eine fachlich fundierte, ausführliche Beratung und die Möglichkeit, die Ware zu testen", "Ein schnelles Gespräch, damit sie nicht ins Grübeln kommt", "Möglichst viele Ergänzungsartikel gleich am Anfang", "Der Hinweis, dass alle anderen Kundinnen dieses Modell kaufen"], a: 0, ex: "So gewinnen Sie das Vertrauen der Kundin.", p: "S. 169" },
+        { t: "tf", q: "Bei einfachen Alltagsprodukten ist meist keine Unterscheidung nach dem Geschlecht nötig.", a: true, ex: "Längst nicht jede Verkaufssituation erfordert ein geschlechtsspezifisches Vorgehen.", p: "S. 170" },
+        { t: "mc", q: "Was macht Gender-Marketing?", o: ["Es untersucht das geschlechtstypische Konsumverhalten und setzt gezielt Werbestrategien ein.", "Es verbietet Werbung, die nur Frauen oder nur Männer anspricht.", "Es legt fest, welche Waren nur an Erwachsene verkauft werden dürfen.", "Es misst die Kaufkraft verschiedener Länder."], a: 0, ex: "Gender kommt aus dem Englischen und heißt soziales Geschlecht.", p: "S. 169, Randspalte" }
+      ]
+    },
+    {
+      title: "Kinder und Jugendliche",
+      pages: "S. 170–172",
+      facts: [
+        { h: "Kinder", p: "S. 170–171", list: [
+          "Kinder beeinflussen den Einkauf ihrer Eltern: Sie bringen bis zu zehn Artikel zum Spontankauf, oft ohne dass die Eltern es bemerken.",
+          "Kinder sind auch direkte Käufer und die Kunden von morgen. Fühlen sie sich zurückgesetzt, erzählen sie es zu Hause. Dann meiden manchmal auch die Eltern das Geschäft."
+        ] },
+        { h: "Geschäftsfähigkeit", p: "S. 171", list: [
+          "Unter 7 Jahren: geschäftsunfähig. Kinder dürfen nur Botengänge für die Eltern machen. Ist die Ware nicht da, geben Sie keine Ersatzware mit.",
+          "Ab 7 Jahren: beschränkt geschäftsfähig. Die Eltern müssen zustimmen, außer das Kind bezahlt im Rahmen seines Taschengeldes.",
+          "Bei größeren Beträgen lassen Sie besser die Zustimmung der Eltern einholen. Ratenkäufe mit Jugendlichen schließen Sie überhaupt nicht ab."
+        ] },
+        { h: "Jugendliche und junge Erwachsene", p: "S. 171–172", list: [
+          "14 bis 21 Jahre: kaufkräftig durch Taschengeld, Geldgeschenke, Jobs oder eigenes Einkommen.",
+          "Wichtig sind Image, Trends, Markenartikel und neue Produkte. Influencer in sozialen Medien beeinflussen stark.",
+          "Bei Lebensmitteln greifen viele zu Convenienceprodukten und achten wenig auf Qualität.",
+          "Oft zählt nicht der Nutzen, sondern die Anerkennung im Freundeskreis."
+        ], term: ["Digital Natives", "Personen, die mit digitalen Medien und Technologien aufgewachsen sind. Sie nutzen gern Omni-Channel-Angebote (Kontakt im Geschäft und online)."] },
+        { h: "Jugendschutzgesetz: Abgabeverbot", p: "S. 172", list: [
+          "Unter 18: starke alkoholische Getränke (über 15 Vol.-%), Alkopops, Tabakwaren, jugendgefährdende Zeitschriften und Bücher, Feuerwerk der Kategorie F2 (nur 28.–31. Dezember).",
+          "Unter 16: Getränke mit geringem Alkoholgehalt wie Bier und Wein.",
+          "Unter 12: Partyknaller, Wunderkerzen und anderes Feuerwerk der Kategorie F1.",
+          "Verlassen Sie sich nicht auf Ihre Schätzung. Fragen Sie nach dem Ausweis."
+        ] }
+      ],
+      qs: [
+        { t: "mc", q: "Bis zu wie vielen Artikeln bringen Kinder ihre Eltern laut einer Studie zum Spontankauf?", o: ["bis zu 10", "bis zu 3", "bis zu 25", "keinen einzigen"], a: 0, ex: "Und das oft, ohne dass die Eltern es bewusst wahrnehmen.", p: "S. 170" },
+        { t: "mc", q: "Ein sechsjähriges Kind soll für seine Mutter ein Vollkornbrot holen. Das Brot ist ausverkauft. Was tun Sie?", o: ["Ich gebe keine Ersatzware mit.", "Ich gebe ein ähnliches Brot mit.", "Ich gebe das teuerste Brot mit, das ist sicher gut.", "Ich verkaufe dem Kind stattdessen Süßigkeiten."], a: 0, ex: "Kinder unter sieben Jahren sind geschäftsunfähig und dürfen nur Botengänge machen.", p: "S. 171" },
+        { t: "tf", q: "Ein zehnjähriges Kind kauft von seinem Taschengeld ein Comicheft für 4 €. Sie dürfen es verkaufen.", a: true, ex: "Beschränkt geschäftsfähige Kinder dürfen kaufen, was sie im Rahmen ihres Taschengeldes bezahlen können.", p: "S. 171" },
+        { t: "mc", q: "Ein 15-Jähriger möchte eine Spielkonsole für 450 € kaufen. Wie verhalten Sie sich?", o: ["Ich lasse die Zustimmung der Eltern einholen.", "Ich verkaufe sofort, er hat ja das Geld dabei.", "Ich biete ihm einen Ratenkauf an.", "Ich verkaufe nur, wenn er volljährig aussieht."], a: 0, ex: "Bei größeren Beträgen ist es besser, die Zustimmung der Eltern einzuholen.", p: "S. 171–172" },
+        { t: "sort", q: "An der Kasse: Dürfen Sie verkaufen?", cats: ["Erlaubt", "Nicht erlaubt"], items: [
+          ["Eine 16-Jährige kauft eine Flasche Wein.", 0], ["Ein 17-Jähriger kauft eine Flasche Bier.", 0],
+          ["Ein 14-Jähriger kauft im Juli Wunderkerzen (Kategorie F1).", 0], ["Ein 19-Jähriger kauft am 29. Dezember Raketen (Kategorie F2).", 0],
+          ["Ein 17-Jähriger kauft Alkopops.", 1], ["Eine 17-Jährige kauft Zigaretten.", 1], ["Eine 11-Jährige kauft Partyknaller.", 1]
+        ], ex: "Bier und Wein ab 16, starke Alkoholika, Alkopops und Tabak ab 18, Feuerwerk F1 ab 12, F2 ab 18 und nur vom 28. bis 31. Dezember.", p: "S. 172" },
+        { t: "mc", q: "Eine Kundin will Wodka kaufen. Sie sind unsicher, ob sie schon 18 ist. Was tun Sie?", o: ["Ich frage nach einem Ausweis.", "Ich schätze ihr Alter, das reicht.", "Ich frage, ob sie schon 18 ist, und glaube ihr.", "Ich verkaufe, wenn sie den Wodka für ihre Eltern holt."], a: 0, ex: "Verlassen Sie sich bei der Alterskontrolle nie auf Ihre persönliche Schätzung.", p: "S. 172" },
+        { t: "tf", q: "Mit einem 17-Jährigen, der einen Ausbildungsplatz hat, dürfen Sie einen Ratenkauf abschließen.", a: false, ex: "Ratenkäufe dürfen mit Jugendlichen überhaupt nicht abgeschlossen werden.", p: "S. 172" },
+        { t: "mc", q: "Wer sind „Digital Natives“?", o: ["Personen, die mit digitalen Medien und Technologien aufgewachsen sind", "Mitarbeitende in der IT-Abteilung", "Kunden, die nur online einkaufen und nie ins Geschäft kommen", "Personen, die in einem anderen Land geboren sind"], a: 0, ex: "Sie sind mit dem Internet aufgewachsen und im Umgang damit vertraut.", p: "S. 171, Randspalte" },
+        { t: "mc", q: "Welches Angebot ist ein Omni-Channel-Serviceangebot?", o: ["Ware online reservieren und später im Laden abholen", "Ein Sonderangebot im Schaufenster", "Eine Stempelkarte aus Papier", "Längere Öffnungszeiten am Samstag"], a: 0, ex: "Omni-Channel heißt: Kundenkontakt über alle Kanäle, im Geschäft (stationär) und digital (online).", p: "S. 171" },
+        { t: "mc", q: "Warum kaufen Jugendliche oft Artikel, bei denen nicht der Nutzen im Vordergrund steht?", o: ["Wegen der möglichen Anerkennung im Freundeskreis", "Weil diese Artikel immer besonders günstig sind", "Weil die Eltern es so wollen", "Weil sie lange über jeden Kauf nachdenken"], a: 0, ex: "Image und Trend sind Jugendlichen besonders wichtig.", p: "S. 172" }
+      ]
+    },
+    {
+      title: "Generation 50plus und internationale Kunden",
+      pages: "S. 172–174",
+      facts: [
+        { h: "Generation 50plus", p: "S. 172–173", list: [
+          "Eine wachsende Zielgruppe mit guter Kaufkraft: Sie verfügt über 47 % der Kaufkraft in Deutschland, Tendenz steigend.",
+          "Viele fühlen sich jünger, sind aktiv, qualitätsbewusst und wollen fachkundig beraten werden. Man spricht auch von Best Agern.",
+          "64 % bestellen einmal im Monat online. Trotzdem gilt: Je älter, desto wichtiger ist der persönliche Einkauf im Geschäft."
+        ], term: ["Silver Surfer", "ältere Menschen, die das Internet nutzen"] },
+        { h: "Was Älteren hilft", p: "S. 173", list: [
+          "Sitzgelegenheiten, Leselupen und eine gut lesbare Preisauszeichnung",
+          "Hilfe bei der Produktwahl, beim Verpacken und beim Abzählen des Geldes",
+          "Service wie Reparaturdienst, Lieferung und Montage",
+          "Bei schlechtem Hören: deutlich sprechen und nachfragen, ob alles verstanden wurde",
+          "Viele leben allein: Lebensmittel in kleinen Mengen und einfach zuzubereitende Gerichte"
+        ] },
+        { h: "Internationale Kunden", p: "S. 174", list: [
+          "2023 lebten 13,9 Mio. Menschen mit ausländischer Staatsangehörigkeit in Deutschland, die meisten aus der Türkei, der Ukraine und Syrien.",
+          "Dazu kommen Kunden mit kurzem Aufenthalt: Touristen, Handelsreisende, Messebesucher, Patienten und Angehörige, Schüler und Studierende, Grenzgänger.",
+          "Sprachbarrieren lösen: langsam und deutlich sprechen, freundlich bleiben, auf Symbole oder Zahlen zeigen, die Ware sprechen lassen, eine Fremdsprache nutzen.",
+          "Auch wichtig: internationale Kreditkarten, digitale Zahlung (z. B. PayPal), passendes Sortiment, mehrsprachige Etiketten."
+        ] }
+      ],
+      qs: [
+        { t: "mc", q: "Über wie viel Prozent der Kaufkraft in Deutschland verfügt die Generation 50plus?", o: ["47 %", "12 %", "25 %", "80 %"], a: 0, ex: "Und der Anteil steigt.", p: "S. 173" },
+        { t: "mc", q: "Wer sind „Silver Surfer“?", o: ["Ältere Menschen, die das Internet nutzen", "Kunden, die nur Silberschmuck kaufen", "Jugendliche, die viel Sport treiben", "Kunden, die immer nach Rabatten fragen"], a: 0, ex: "Schon 64 % der Generation 50plus bestellen einmal im Monat online.", p: "S. 173" },
+        { t: "tf", q: "Je älter die Kunden sind, desto unwichtiger wird für sie der persönliche Einkauf im Geschäft.", a: false, ex: "Umgekehrt: Je älter die Kunden sind, desto wichtiger ist der persönliche Einkauf im Geschäft.", p: "S. 173" },
+        { t: "sort", q: "Hilft das älteren Kundinnen und Kunden?", cats: ["Hilft", "Hilft nicht"], items: [
+          ["Sitzgelegenheiten im Geschäft", 0], ["Leselupen bereitstellen", 0], ["gut lesbare Preisschilder", 0],
+          ["Lebensmittel in kleinen Mengen", 0], ["Lieferung und Montage anbieten", 0],
+          ["schnell und leise sprechen, damit es zügig geht", 1], ["nur Großpackungen anbieten", 1]
+        ], ex: "Ein Teil der Älteren ist in Mobilität, Hören und Sehen eingeschränkt. Viele leben in Single-Haushalten.", p: "S. 173" },
+        { t: "mc", q: "Ein älterer Kunde hört schlecht. Was tun Sie?", o: ["Deutlich sprechen und mich vergewissern, dass er alles verstanden hat", "Ihm einen Prospekt geben und weitergehen", "Mit seiner Begleitung statt mit ihm sprechen", "Möglichst viele Fachbegriffe verwenden"], a: 0, ex: "Achten Sie auf eine deutliche Aussprache.", p: "S. 173" },
+        { t: "mc", q: "Wie viele Menschen mit ausländischer Staatsangehörigkeit lebten 2023 in Deutschland?", o: ["13,9 Mio.", "7,3 Mio.", "1,5 Mio.", "30 Mio."], a: 0, ex: "2003 waren es noch 7,3 Mio.", p: "S. 174, Diagramm" },
+        { t: "mc", q: "Aus welchem Land kamen 2023 die meisten Menschen mit ausländischer Staatsangehörigkeit?", o: ["Türkei", "Polen", "Italien", "Rumänien"], a: 0, ex: "Türkei 1 548 100, dann Ukraine und Syrien.", p: "S. 174, Diagramm" },
+        { t: "sort", q: "Ein Tourist spricht kaum Deutsch. Was hilft gegen die Sprachbarriere?", cats: ["Hilft", "Hilft nicht"], items: [
+          ["langsam und deutlich sprechen", 0], ["auf Symbole oder Zahlen hinweisen", 0], ["die Ware zeigen und „sprechen lassen“", 0], ["in einer Fremdsprache sprechen", 0],
+          ["lauter und schneller sprechen", 1], ["viele Fachbegriffe benutzen", 1]
+        ], ex: "Bleiben Sie dabei freundlich und aufmerksam.", p: "S. 174" },
+        { t: "tf", q: "Auch Messebesucher sowie Patienten von Kliniken und ihre Angehörigen zählen zu den internationalen Kunden.", a: true, ex: "Dazu gehören auch Kunden, die nur kurz in Deutschland sind.", p: "S. 174" },
+        { t: "mc", q: "Was kann ein Geschäft für internationale Kunden außerdem tun?", o: ["Internationale Kreditkarten und digitale Zahlung annehmen und mehrsprachige Etiketten nutzen", "Nur Bargeld in Euro annehmen", "Ausländische Produkte aus dem Sortiment nehmen", "Nur auf Englisch beraten"], a: 0, ex: "Auch eine Sortimentsanpassung, z. B. asiatische Produkte in einer eigenen Verkaufszone, hilft.", p: "S. 174" }
+      ]
+    },
+    {
+      title: "Kundentypen nach Kaufmotiv und Situation",
+      pages: "S. 175–176",
+      facts: [
+        { h: "Drei Arten, Kundentypen zu unterscheiden", p: "S. 175", list: [
+          "nach den Kaufmotiven",
+          "nach den situationsbezogenen Verhaltensweisen",
+          "nach den charakterlichen Eigenschaften (Station 5)"
+        ] },
+        { h: "Nach dem Kaufmotiv", p: "S. 175", list: [
+          "Preisorientiert (Smartshopper): sucht Schnäppchen, vergleicht ständig Preise, feilscht gern. Bieten Sie Rabatte, Sonderangebote oder Bonusaktionen und stellen Sie den Mehrwert heraus.",
+          "Markenbewusst: entscheidet weniger mit dem Verstand, vertraut der Marke. Der Preis ist zweitrangig. Überzeugend sind Premiumqualität und nachkaufbare Ersatzteile.",
+          "Gesundheitsorientiert: achtet auf Ernährung, Entspannung und Fitness. Richten Sie die Argumente am Wohlbefinden aus. Bio-Kunden sind keine homogene Gruppe und geben oft deutlich mehr aus."
+        ], term: ["Wellness", "Kombination aus wellbeing (Wohlbefinden) und fitness. Homogen = gleichmäßig zusammengesetzt."] },
+        { h: "Nach der Situation", p: "S. 176", list: [
+          "Eilige Kunden: großer Zeitdruck. Schnellscannerkassen anbieten, Laufwege optimieren.",
+          "Späte Kunden: kommen kurz vor Ladenschluss, meist mit klarem Wunsch. Flexibel bleiben, gezielt fragen, den Einkauf beschleunigen.",
+          "Serviceorientierte Kunden: wollen perfekten Service und Beratung, dazu Dienstleistungen wie Umtausch und einfaches Rückgaberecht.",
+          "Showroomer: lassen sich beraten und kaufen dann online oder woanders günstiger. Sie stellen viele detaillierte Fragen. Bieten Sie z. B. Mitgliedschaftsvorteile oder Garantieleistungen."
+        ] }
+      ],
+      qs: [
+        { t: "mc", q: "Nach welchen Gesichtspunkten unterscheidet das Buch Kundentypen?", o: ["Kaufmotive, charakterliche Eigenschaften, situationsbezogenes Verhalten", "Alter, Geschlecht, Wohnort", "Einkommen, Beruf, Haushaltsgröße", "Online, stationär, Katalog"], a: 0, ex: "Alter, Geschlecht und Wohnort sind demografische Merkmale. Sie bilden Kundengruppen, keine Kundentypen.", p: "S. 175" },
+        { t: "mc", q: "Welcher Kundentyp ist das?", quote: "„Im Netz kostet der Mixer 79 €, bei Ihnen 89 €. Was können Sie mir da machen?“", o: ["Preisorientierter Kunde (Smartshopper)", "Markenbewusster Kunde", "Gesundheitsorientierter Kunde", "Gesprächsfreudiger Kunde"], a: 0, ex: "Der Smartshopper vergleicht ständig Preise und neigt zum Feilschen.", p: "S. 175" },
+        { t: "mc", q: "Wie überzeugen Sie einen Smartshopper am ehesten?", o: ["Mit Kaufanreizen wie Rabatten oder Bonusaktionen und indem ich den Mehrwert herausstelle", "Indem ich betone, dass die Marke sehr bekannt ist", "Indem ich ihm Entspannungstipps gebe", "Indem ich das Gespräch schnell beende"], a: 0, ex: "Stellen Sie den Mehrwert des Produkts heraus.", p: "S. 175" },
+        { t: "mc", q: "Welcher Kundentyp ist das?", quote: "„Ich nehme nur das Original. Da weiß ich, was ich habe, egal was es kostet.“", o: ["Markenbewusster Kunde", "Preisorientierter Kunde", "Showroomer", "Skeptischer Kunde"], a: 0, ex: "Bekanntheit und Image der Marke schaffen Vertrauen. Der Preis ist zweitrangig.", p: "S. 175" },
+        { t: "mc", q: "Welches Argument überzeugt markenbewusste Kunden besonders?", o: ["Premiumqualität und die Möglichkeit, Ersatzteile nachzukaufen", "Das günstigste Angebot im Regal", "Die kürzeste Wartezeit an der Kasse", "Ein Rezept für ein gesundes Frühstück"], a: 0, ex: "Hinweise auf Premiumqualitäten und Ersatzteile überzeugen diese Kunden.", p: "S. 175" },
+        { t: "tf", q: "Bio-Kunden sind eine homogene Gruppe, also alle gleich.", a: false, ex: "Es gibt Intensivkäufer, denen Umwelt und Tierschutz wichtig sind, aber auch Seiten- und Gelegenheitskäufer und Genießer.", p: "S. 175" },
+        { t: "mc", q: "Umfrage 2024: Was ist Verbrauchern beim Lebensmitteleinkauf am wichtigsten?", o: ["Geschmack (94 %)", "niedriger Preis (55 %)", "Angebote (68 %)", "Regionalität (77 %)"], a: 0, ex: "Ein niedriger Preis ist nur 55 % der Befragten wichtig.", p: "S. 175, Diagramm" },
+        { t: "sort", q: "Welcher Kundentyp ist es? Ordnen Sie die Situation zu.", cats: ["Eilig", "Spät", "Serviceorientiert", "Showroomer"], items: [
+          ["Will in der Mittagspause schnell drei Dinge holen.", 0],
+          ["Kommt um 19:50 Uhr und weiß genau, welches Ladekabel er braucht.", 1],
+          ["Erwartet eine ausführliche Beratung und ein einfaches Rückgaberecht.", 2],
+          ["Lässt sich 30 Minuten beraten und fotografiert dann die Artikelnummer.", 3]
+        ], ex: "Showroomer werden auch Beratungsdiebe genannt.", p: "S. 176" },
+        { t: "mc", q: "Was bieten Sie einem Showroomer an?", o: ["Spezielle Mitgliedschaftsvorteile oder Garantieleistungen", "Gar keine Beratung mehr", "Ein Hausverbot", "Den Hinweis, dass es online billiger ist"], a: 0, ex: "Showroomer sind äußerst preisbewusst. Zusatzvorteile können sie im Geschäft halten.", p: "S. 176" },
+        { t: "mc", q: "Wie unterstützen Sie eilige Kunden?", o: ["Mit Schnellscannerkassen und kurzen Laufwegen", "Mit einem langen Beratungsgespräch", "Mit einer Kundenumfrage an der Kasse", "Mit einer Warenprobe zum Mitnehmen"], a: 0, ex: "Eilige Kunden wollen ihren Einkauf schnell und effizient erledigen.", p: "S. 176" }
+      ]
+    },
+    {
+      title: "Kundentypen nach dem Charakter",
+      pages: "S. 176–177",
+      facts: [
+        { h: "Sachverständige Kunden", p: "S. 176", list: [
+          "Haben viel Wissen und Erfahrung, einen klaren Kaufwunsch und vergleichen Produkte und Marken.",
+          "Erwarten geschultes, kompetentes Personal. Lassen Sie sie die Produkte ausprobieren oder testen."
+        ] },
+        { h: "Skeptische Kunden", p: "S. 177", list: [
+          "Sind misstrauisch, recherchieren intensiv, lesen Bewertungen und entscheiden erst nach reiflicher Überlegung.",
+          "Seien Sie offen und ehrlich, übertreiben Sie nicht. Geduld, Zuhören und Einfühlungsvermögen sind Türöffner. Bieten Sie Garantien oder Probezeiten an."
+        ] },
+        { h: "Interessierte Kunden", p: "S. 177", list: [
+          "Interessieren sich schon für eine bestimmte Ware und brauchen weitere Informationen. Sie fragen aktiv nach.",
+          "Beraten Sie umfassend und klar, z. B. zusätzlich mit Broschüren. Präsentieren Sie Vorteile und Besonderheiten."
+        ] },
+        { h: "Gesprächsfreudige Kunden", p: "S. 177", list: [
+          "Kommunizieren gern, stellen viele Fragen und erzählen von ihren Erfahrungen. Einkaufen soll ein positives Erlebnis sein.",
+          "Zeigen Sie echtes Interesse, hören Sie aktiv zu und beantworten Sie Fragen ausführlich."
+        ] },
+        { h: "Unentschlossene Kunden", p: "S. 177", list: [
+          "Tun sich schwer mit der Entscheidung, sind unsicher und stellen viele Fragen.",
+          "Sie wägen lange Vor- und Nachteile ab und schwanken in ihren Entscheidungen. Wie Sie ihnen helfen, lesen Sie im Buch auf der folgenden Seite."
+        ] }
+      ],
+      qs: [
+        { t: "mc", q: "Welcher Kundentyp ist das?", quote: "„Ich habe drei Testberichte gelesen und die Bewertungen sind gemischt. Hält der Akku wirklich zehn Stunden?“", o: ["Skeptischer Kunde", "Gesprächsfreudiger Kunde", "Eiliger Kunde", "Markenbewusster Kunde"], a: 0, ex: "Skeptische Kunden recherchieren intensiv, lesen Bewertungen und zweifeln an Angaben zur Ware.", p: "S. 177" },
+        { t: "mc", q: "Welcher Kundentyp ist das?", quote: "„Ich kenne mich mit Siebträgern gut aus. Ich schwanke zwischen diesen beiden Modellen. Kann ich beide ausprobieren?“", o: ["Sachverständiger Kunde", "Unentschlossener Kunde", "Späte Kundin", "Preisorientierter Kunde"], a: 0, ex: "Er hat umfangreiche Kenntnisse und vergleicht gezielt Produkte.", p: "S. 176" },
+        { t: "mc", q: "Welcher Kundentyp ist das?", quote: "„Ach, mein Enkel hat mir letzte Woche auch so eine Uhr gezeigt. Tragen Sie selbst eine? Wie finden Sie die?“", o: ["Gesprächsfreudige Kundin", "Skeptische Kundin", "Showroomerin", "Eilige Kundin"], a: 0, ex: "Gesprächsfreudige Kunden möchten Erfahrungen und Meinungen austauschen.", p: "S. 177" },
+        { t: "mc", q: "Welcher Kundentyp ist das?", quote: "„Die blaue oder doch die graue? Was meinen Sie? Oder doch noch einmal die erste?“", o: ["Unentschlossene Kundin", "Sachverständige Kundin", "Markenbewusste Kundin", "Interessierte Kundin"], a: 0, ex: "Unentschlossene Kunden schwanken in ihren Entscheidungen.", p: "S. 177" },
+        { t: "mc", q: "Welcher Kundentyp ist das?", quote: "„Diese Jacke gefällt mir. Ist sie wasserdicht, und wie wasche ich sie?“", o: ["Interessierter Kunde", "Skeptischer Kunde", "Showroomer", "Gesprächsfreudiger Kunde"], a: 0, ex: "Er interessiert sich bereits für eine bestimmte Ware und braucht weitere Informationen.", p: "S. 177" },
+        { t: "mc", q: "Wie gehen Sie mit skeptischen Kunden um?", o: ["Offen und ehrlich beraten, nicht übertreiben, Garantien oder Probezeiten anbieten", "Die Vorteile möglichst stark übertreiben", "Den Kunden drängen, sich schnell zu entscheiden", "Auf die Bewertungen im Internet schimpfen"], a: 0, ex: "Lassen Sie die Kunden die Ware auch selbst ausprobieren.", p: "S. 177" },
+        { t: "tf", q: "Bei skeptischen Kunden sind Geduld, Zuhören und Einfühlungsvermögen wahre Türöffner.", a: true, ex: "Zeigen Sie Verständnis für die Zweifel.", p: "S. 177" },
+        { t: "mc", q: "Was erwarten sachverständige Kunden vom Verkaufspersonal?", o: ["Geschultes Personal mit detaillierter, kompetenter Beratung", "Möglichst wenig Informationen", "Vor allem Rabatte", "Small Talk über das Wetter"], a: 0, ex: "Geben Sie ihnen die Möglichkeit, Produkte auszuprobieren oder zu testen.", p: "S. 176" },
+        { t: "mc", q: "Wie beraten Sie gesprächsfreudige Kunden?", o: ["Echtes Interesse zeigen, aktiv zuhören und Fragen ausführlich beantworten", "Kurz angebunden bleiben, damit das Gespräch nicht ausufert", "Sie an eine Kollegin weitergeben", "Nur schriftliche Informationen ausgeben"], a: 0, ex: "Der soziale Kontakt spielt für diese Kunden eine große Rolle.", p: "S. 177" },
+        { t: "mc", q: "Was hilft interessierten Kunden besonders?", o: ["Eine umfassende, klare Beratung, z. B. zusätzlich mit Broschüren", "Möglichst schnell zur Kasse zu kommen", "Ein Hinweis auf den günstigsten Onlineshop", "Ein Gespräch über ein ganz anderes Produkt"], a: 0, ex: "Stellen Sie Vorteile und Besonderheiten der Ware vor.", p: "S. 177" }
+      ]
+    }
+  ];
+
+  // ---------------- Speicher ----------------
+  function load() { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch (e) { return {}; } }
+  function save() { try { localStorage.setItem(STORE, JSON.stringify(state.saved)); } catch (e) {} }
+
+  const state = { saved: load(), view: "home", st: 0, qi: 0, score: 0, answered: false, sel: [], order: [], wrong: [], name: "" };
+  state.name = state.saved.name || "";
+  state.saved.best = state.saved.best || {};
+
+  const app = document.getElementById("app");
+  const bar = document.getElementById("bar");
+  const barIn = document.getElementById("barIn");
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+  function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+  function maxPts(q) { return q.t === "sort" ? q.items.length : 1; }
+  function stationMax(s) { return s.qs.reduce((n, q) => n + maxPts(q), 0); }
+  function setBar(buttons) {
+    barIn.innerHTML = "";
+    if (!buttons.length) { bar.hidden = true; return; }
+    bar.hidden = false;
+    buttons.forEach(b => {
+      const el = document.createElement("button");
+      el.className = "btn" + (b.ghost ? " ghost" : "");
+      el.type = "button"; el.textContent = b.label; el.id = b.id;
+      if (b.disabled) el.disabled = true;
+      el.addEventListener("click", b.on);
+      barIn.appendChild(el);
+    });
+  }
+  function top() { window.scrollTo(0, 0); }
+  function grade(pct) {
+    if (pct >= 92) return "sehr gut (1)";
+    if (pct >= 81) return "gut (2)";
+    if (pct >= 67) return "befriedigend (3)";
+    if (pct >= 50) return "ausreichend (4)";
+    if (pct >= 30) return "mangelhaft (5)";
+    return "ungenügend (6)";
+  }
+
+  // ---------------- Startseite ----------------
+  function home() {
+    state.view = "home";
+    const done = STATIONS.filter((s, i) => state.saved.best[i] != null).length;
+    app.innerHTML = `
+      <div class="kicker">Lernfeld 10 · 2. Ausbildungsjahr</div>
+      <h1>Kundenvielfalt</h1>
+      <p class="muted">Kundengruppen und Kundentypen im Einzelhandel. Buch „Ausbildung im Einzelhandel“, S. 168–177.</p>
+      <div class="task">
+        <h3>Ihr Arbeitsauftrag</h3>
+        <ol>
+          <li>Lesen Sie die Seiten der jeweiligen Station im Buch.</li>
+          <li>Lesen Sie in der App „Das Wichtigste“ und bearbeiten Sie danach die Aufgaben.</li>
+          <li>Bearbeiten Sie alle fünf Stationen. Sie können jede Station wiederholen. Es zählt Ihr bestes Ergebnis.</li>
+          <li>Machen Sie am Ende einen Screenshot von Ihrem Nachweis und bewahren Sie ihn für Ihre Lehrkraft auf.</li>
+        </ol>
+      </div>
+      <label class="field" for="name">Ihr Name (für den Nachweis)
+        <input type="text" id="name" autocomplete="name" placeholder="Vorname Nachname" value="${esc(state.name)}">
+      </label>
+      <div class="stations">
+        ${STATIONS.map((s, i) => {
+          const b = state.saved.best[i];
+          return `<button class="station${b != null ? " done" : ""}" data-st="${i}" type="button">
+            <span class="num">${b != null ? "✓" : i + 1}</span>
+            <span><span class="t">${esc(s.title)}</span><span class="s">${s.pages} · ${s.qs.length} Aufgaben</span></span>
+            <span class="score">${b != null ? b + "/" + stationMax(s) : "offen"}</span>
+          </button>`;
+        }).join("")}
+      </div>
+      <p class="note">${done} von ${STATIONS.length} Stationen erledigt. Ihre Ergebnisse werden nur auf diesem Gerät gespeichert.</p>`;
+    const nameEl = document.getElementById("name");
+    nameEl.addEventListener("input", () => { state.name = nameEl.value; state.saved.name = nameEl.value; save(); });
+    app.querySelectorAll(".station").forEach(b => b.addEventListener("click", () => intro(+b.dataset.st)));
+    setBar([{ id: "toCert", label: "Zum Nachweis", disabled: done === 0, on: certificate }]);
+    top();
+  }
+
+  // ---------------- Wissen ----------------
+  function intro(i) {
+    state.view = "intro"; state.st = i;
+    const s = STATIONS[i];
+    app.innerHTML = `
+      <div class="kicker">Station ${i + 1} von ${STATIONS.length} · ${s.pages}</div>
+      <h2>${esc(s.title)}</h2>
+      <p class="muted">Das Wichtigste in Kürze. Lesen Sie zuerst die Seiten im Buch, dann diese Zusammenfassung.</p>
+      <div class="facts">
+        ${s.facts.map(f => `<div class="card fact">
+          <h3>${esc(f.h)}</h3>
+          <ul>${f.list.map(l => `<li>${esc(l)}</li>`).join("")}</ul>
+          ${f.term ? `<div class="term"><b>${esc(f.term[0])}:</b> ${esc(f.term[1])}</div>` : ""}
+          <div class="page">${f.p}</div>
+        </div>`).join("")}
+      </div>`;
+    setBar([{ id: "back", label: "Zurück", ghost: true, on: home }, { id: "start", label: `Aufgaben starten (${s.qs.length})`, on: () => startQuiz(i) }]);
+    top();
+  }
+
+  // ---------------- Aufgaben ----------------
+  function startQuiz(i) {
+    state.st = i; state.qi = 0; state.score = 0; state.wrong = [];
+    question();
+  }
+  function question() {
+    state.view = "q"; state.answered = false; state.sel = [];
+    const s = STATIONS[state.st], q = s.qs[state.qi];
+    const pct = (state.qi / s.qs.length) * 100;
+    let body = "";
+    if (q.t === "mc") {
+      state.order = shuffle(q.o.map((_, k) => k));
+      body = `<div class="opts">${state.order.map(k => `<button class="opt" type="button" data-k="${k}">${esc(q.o[k])}</button>`).join("")}</div>`;
+    } else if (q.t === "tf") {
+      body = `<div class="tf"><button class="opt" type="button" data-v="1">Richtig</button><button class="opt" type="button" data-v="0">Falsch</button></div>`;
+    } else {
+      state.order = shuffle(q.items.map((_, k) => k));
+      state.sel = q.items.map(() => -1);
+      body = `<div class="opts">${state.order.map(k => `<div class="sort-item" data-k="${k}">
+          <div>${esc(q.items[k][0])}</div>
+          <div class="chips">${q.cats.map((c, ci) => `<button class="chip" type="button" data-c="${ci}">${esc(c)}</button>`).join("")}</div>
+        </div>`).join("")}</div>`;
+    }
+    const label = q.t === "mc" ? "Eine Antwort ist richtig" : q.t === "tf" ? "Richtig oder falsch?" : "Zuordnen";
+    app.innerHTML = `
+      <div class="qhead"><span class="kicker">Station ${state.st + 1} · ${esc(s.title)}</span></div>
+      <div class="progress" aria-hidden="true"><i style="width:${pct}%"></i></div>
+      <div class="qhead"><span class="qtype">Aufgabe ${state.qi + 1}/${s.qs.length}</span><span class="qtype">${label}</span></div>
+      <h2>${esc(q.q)}</h2>
+      ${q.quote ? `<div class="quote">${esc(q.quote)}</div>` : ""}
+      ${body}
+      <div id="fb"></div>`;
+    if (q.t === "mc") app.querySelectorAll(".opt").forEach(b => b.addEventListener("click", () => answerMc(+b.dataset.k)));
+    if (q.t === "tf") app.querySelectorAll(".opt").forEach(b => b.addEventListener("click", () => answerTf(b.dataset.v === "1")));
+    if (q.t === "sort") {
+      app.querySelectorAll(".sort-item").forEach(it => {
+        const k = +it.dataset.k;
+        it.querySelectorAll(".chip").forEach(ch => ch.addEventListener("click", () => {
+          if (state.answered) return;
+          state.sel[k] = +ch.dataset.c;
+          it.querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c === ch));
+          document.getElementById("check").disabled = state.sel.some(v => v < 0);
+        }));
+      });
+      setBar([{ id: "quit", label: "Abbrechen", ghost: true, on: () => intro(state.st) }, { id: "check", label: "Prüfen", disabled: true, on: answerSort }]);
+    } else {
+      setBar([{ id: "quit", label: "Abbrechen", ghost: true, on: () => intro(state.st) }]);
+    }
+    top();
+  }
+  function feedback(got, max, q) {
+    state.score += got;
+    if (got < max) state.wrong.push(q);
+    const cls = got === max ? "good" : got > 0 ? "mid" : "bad";
+    const head = got === max ? "Richtig!" : got > 0 ? `Teilweise richtig: ${got} von ${max}` : "Leider falsch.";
+    const fb = document.getElementById("fb");
+    fb.className = "feedback " + cls;
+    fb.innerHTML = `<strong>${head}</strong><p>${esc(q.ex)}</p><div class="page">Nachlesen: ${q.p}</div>`;
+    state.answered = true;
+    const last = state.qi === STATIONS[state.st].qs.length - 1;
+    setBar([{ id: "next", label: last ? "Ergebnis ansehen" : "Weiter", on: next }]);
+    fb.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "nearest" });
+  }
+  function answerMc(k) {
+    if (state.answered) return;
+    const q = STATIONS[state.st].qs[state.qi];
+    app.querySelectorAll(".opt").forEach(b => {
+      const bk = +b.dataset.k; b.disabled = true;
+      if (bk === q.a) b.classList.add("right");
+      else if (bk === k) b.classList.add("wrong");
+      else b.classList.add("dim");
+    });
+    feedback(k === q.a ? 1 : 0, 1, q);
+  }
+  function answerTf(v) {
+    if (state.answered) return;
+    const q = STATIONS[state.st].qs[state.qi];
+    app.querySelectorAll(".opt").forEach(b => {
+      const bv = b.dataset.v === "1"; b.disabled = true;
+      if (bv === q.a) b.classList.add("right");
+      else if (bv === v) b.classList.add("wrong");
+    });
+    feedback(v === q.a ? 1 : 0, 1, q);
+  }
+  function answerSort() {
+    if (state.answered) return;
+    const q = STATIONS[state.st].qs[state.qi];
+    let got = 0;
+    app.querySelectorAll(".sort-item").forEach(it => {
+      const k = +it.dataset.k, should = q.items[k][1], ok = state.sel[k] === should;
+      if (ok) got++;
+      it.classList.add(ok ? "right" : "wrong");
+      it.querySelectorAll(".chip").forEach(c => { c.disabled = true; if (!ok && +c.dataset.c === should) c.classList.add("should"); });
+      if (!ok) it.insertAdjacentHTML("beforeend", `<div class="fix">Richtig wäre: ${esc(q.cats[should])}</div>`);
+    });
+    feedback(got, q.items.length, q);
+  }
+  function next() {
+    const s = STATIONS[state.st];
+    if (state.qi < s.qs.length - 1) { state.qi++; question(); } else result();
+  }
+
+  // ---------------- Ergebnis einer Station ----------------
+  function result() {
+    state.view = "result";
+    const i = state.st, s = STATIONS[i], max = stationMax(s);
+    const prev = state.saved.best[i];
+    if (prev == null || state.score > prev) state.saved.best[i] = state.score;
+    save();
+    const pct = Math.round(state.score / max * 100);
+    const pages = [...new Set(state.wrong.map(q => q.p))];
+    const nextSt = STATIONS.findIndex((_, k) => state.saved.best[k] == null);
+    app.innerHTML = `
+      <div class="kicker">Station ${i + 1} abgeschlossen</div>
+      <h2>${esc(s.title)}</h2>
+      <div class="card">
+        <div class="big">${state.score}<span class="muted" style="font-size:1.4rem"> / ${max} Punkte</span></div>
+        <p>${pct} % · ${grade(pct)}${prev != null && state.score <= prev ? ` · Ihr Bestwert bleibt ${prev} Punkte.` : ""}</p>
+      </div>
+      ${state.wrong.length ? `<div class="card review">
+        <h3>Das sollten Sie noch einmal nachlesen</h3>
+        <ul>${state.wrong.map(q => `<li>${esc(q.q)} <span class="page">(${q.p})</span></li>`).join("")}</ul>
+      </div>` : `<div class="feedback good"><strong>Alles richtig!</strong><p>Sie beherrschen die Inhalte dieser Station.</p></div>`}
+      ${pages.length ? `<p class="note">Lesen Sie die genannten Stellen nach und wiederholen Sie die Station, wenn Sie Ihr Ergebnis verbessern möchten.</p>` : ""}`;
+    const btns = [{ id: "again", label: "Wiederholen", ghost: true, on: () => startQuiz(i) }];
+    if (nextSt >= 0) btns.push({ id: "nextSt", label: `Weiter mit Station ${nextSt + 1}`, on: () => intro(nextSt) });
+    else btns.push({ id: "cert", label: "Zum Nachweis", on: certificate });
+    setBar(btns);
+    top();
+  }
+
+  // ---------------- Nachweis ----------------
+  function certificate() {
+    state.view = "cert";
+    let got = 0, max = 0, done = 0;
+    STATIONS.forEach((s, i) => { max += stationMax(s); if (state.saved.best[i] != null) { got += state.saved.best[i]; done++; } });
+    const pct = Math.round(got / max * 100);
+    const date = new Date().toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+    app.innerHTML = `
+      <div class="kicker">Nachweis · Lernfeld 10</div>
+      <h2>Kundenvielfalt: Kundengruppen und Kundentypen</h2>
+      <div class="card cert">
+        <div class="rows">
+          <div class="row text"><span>Name</span><span>${state.name.trim() ? esc(state.name.trim()) : "<i>bitte auf der Startseite eintragen</i>"}</span></div>
+          <div class="row text"><span>Datum</span><span>${esc(date)}</span></div>
+          ${STATIONS.map((s, i) => `<div class="row"><span>${i + 1}. ${esc(s.title)}</span><span>${state.saved.best[i] != null ? state.saved.best[i] + "/" + stationMax(s) : "offen"}</span></div>`).join("")}
+        </div>
+        <div class="big">${pct} %</div>
+        <p><b>${got} von ${max} Punkten</b> · ${grade(pct)}</p>
+        ${done < STATIONS.length ? `<p class="fix">Noch offen: ${STATIONS.length - done} Station(en). Offene Stationen zählen mit 0 Punkten.</p>` : ""}
+      </div>
+      <p class="note">Machen Sie jetzt einen Screenshot von dieser Seite und bewahren Sie ihn für Ihre Lehrkraft auf.</p>`;
+    setBar([{ id: "home", label: "Zur Startseite", on: home }]);
+    top();
+  }
+
+  home();
+})();
+</script>

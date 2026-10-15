@@ -53,3 +53,19 @@ Die Bestwerte pro Szenario werden nur im Browser der jeweiligen Person gespeiche
 ## Neue Szenarien ergänzen
 
 Szenarien stehen im Array `SCENARIOS` in `verkaufsgespraech.html`. Jedes Szenario braucht 8 Schritte in der Reihenfolge der Phasen. Jeder Schritt hat drei Antworten mit `s` = 2, 1 und 0 Punkten. Danach `./build.sh` ausführen.
+
+## Lernfeld 10: Kundenvielfalt (Selbstlernmaterial)
+
+Material zu den Buchseiten 168–177 („Ausbildung im Einzelhandel“, Kapitel 1 Kundenvielfalt) im Ordner `lf10-kundenvielfalt/`. Gedacht für eine Stunde ohne Lehrkraft: Die Schülerinnen und Schüler arbeiten selbstständig am Smartphone. Alle Texte sprechen sie mit „Sie“ an.
+
+- `uebung.html`: Online-Übung (Quelle, wird als Claude-Artifact veröffentlicht). Fünf Stationen mit je zehn Aufgaben (Auswahl, richtig/falsch, Zuordnen). Vor jeder Station steht eine Zusammenfassung mit Buchseiten. Nach jeder Aufgabe gibt es eine Erklärung mit Seitenangabe. Am Ende steht ein Nachweis mit Name, Datum, Punkten und Note zum Abfotografieren.
+- `index.html`: eigenständige Version der Übung, erzeugt mit `./build.sh`
+- `Kundenvielfalt_LF10.pptx` (20 Folien) und `Kundenvielfalt_LF10.pdf`: Präsentation im Hochformat, damit sie auf dem Smartphone den Bildschirm füllt. Die PDF lässt sich auf jedem Handy ohne PowerPoint öffnen. Erzeugt mit `build-deck.js`.
+
+| Station | Inhalt | Buch |
+|---|---|---|
+| 1 | Kundengruppen, Frauen und Männer | S. 168–170 |
+| 2 | Kinder und Jugendliche, Geschäftsfähigkeit, Jugendschutz | S. 170–172 |
+| 3 | Generation 50plus, internationale Kunden | S. 172–174 |
+| 4 | Kundentypen nach Kaufmotiv und Situation | S. 175–176 |
+| 5 | Kundentypen nach dem Charakter | S. 176–177 |
