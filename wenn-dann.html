@@ -193,7 +193,7 @@ h2 { font-size: 1.25rem; font-weight: 700; }
   <section id="start">
     <p class="badge">Deutsch A2</p>
     <h1 style="margin-top:10px">Wenn-dann-Sätze</h1>
-    <p class="muted" style="margin:6px 0 0">15 Aufgaben. Zuerst schwer, dann leichter.</p>
+    <p class="muted" style="margin:6px 0 0">15 Aufgaben. Zuerst leicht, dann schwerer.</p>
 
     <div class="card rule">
       <h2>So geht’s</h2>
@@ -208,9 +208,9 @@ h2 { font-size: 1.25rem; font-weight: 700; }
     <div class="card">
       <h2>Drei Stufen</h2>
       <ul class="levels">
-        <li><span class="stars">★★★</span><span><b>1 bis 5:</b> Bring alle Wörter in die richtige Reihenfolge.</span></li>
+        <li><span class="stars">★☆☆</span><span><b>1 bis 5:</b> Welches Wort fehlt?</span></li>
         <li><span class="stars">★★☆</span><span><b>6 bis 10:</b> Welcher Dann-Teil ist richtig?</span></li>
-        <li><span class="stars">★☆☆</span><span><b>11 bis 15:</b> Welches Wort fehlt?</span></li>
+        <li><span class="stars">★★★</span><span><b>11 bis 15:</b> Bring alle Wörter in die richtige Reihenfolge.</span></li>
       </ul>
     </div>
   </section>
@@ -262,21 +262,21 @@ h2 { font-size: 1.25rem; font-weight: 700; }
 </div>
 
 <script>
-/* Aufgaben: von schwer (1) nach leicht (15).
+/* Aufgaben: von leicht (1) nach schwer (15).
    order:  t = Wörter/Wortgruppen in richtiger Reihenfolge. Der Punkt am Ende ist fest.
    pick:   wenn = gegebener Wenn-Teil, o = Antworten, die erste ist richtig, why = Erklärung für die falschen.
    gap:    s = Satz mit ___ als Lücke, o = Wörter, das erste ist richtig. */
 var TASKS = [
-  { type: "order", e: "⏰", t: ["Wenn", "ich", "früh", "aufstehe", ",", "dann", "kann", "ich", "den Bus", "nehmen"],
-    tip: "„kann“ steht direkt nach „dann“. „nehmen“ steht ganz am Ende." },
-  { type: "order", e: "🤒", t: ["Wenn", "du", "krank", "bist", ",", "dann", "musst", "du", "zum Arzt", "gehen"],
-    tip: "„bist“ steht am Ende vom Wenn-Teil. Nach „dann“ kommt „musst“." },
-  { type: "order", e: "🌧️", t: ["Wenn", "es", "am Wochenende", "regnet", ",", "dann", "bleiben", "wir", "zu Hause"],
-    tip: "„regnet“ steht am Ende vom Wenn-Teil." },
-  { type: "order", e: "📞", t: ["Wenn", "die Schule", "aus", "ist", ",", "dann", "rufe", "ich", "meine Mutter", "an"],
-    tip: "„anrufen“ ist trennbar: „rufe“ kommt nach „dann“, „an“ steht ganz am Ende." },
-  { type: "order", e: "📱", t: ["Wenn", "ich", "mehr Geld", "habe", ",", "dann", "kaufe", "ich", "ein neues Handy"],
-    tip: "Wenn-Teil: Verb am Ende. Dann-Teil: dann + Verb + ich." },
+  { type: "gap", e: "😴", s: "Wenn ich müde ___, dann gehe ich ins Bett.", o: ["bin", "bist", "ist"],
+    tip: "ich bin, du bist, er ist" },
+  { type: "gap", e: "☀️", s: "Wenn die Sonne scheint, dann ___ wir in den Park.", o: ["gehen", "geht", "gehst"],
+    tip: "wir gehen, ihr geht, du gehst" },
+  { type: "gap", e: "☂️", s: "___ es regnet, dann nehme ich einen Regenschirm.", o: ["Wenn", "Dann", "Und"],
+    tip: "Der erste Teil beginnt mit …" },
+  { type: "gap", e: "💧", s: "Wenn ich Durst habe, ___ trinke ich Wasser.", o: ["dann", "wenn", "aber"],
+    tip: "Wenn …, ___ …" },
+  { type: "gap", e: "🏠", s: "Wenn ich krank bin, dann ___ ich zu Hause.", o: ["bleibe", "bleibst", "bleibt"],
+    tip: "ich bleibe, du bleibst, er bleibt" },
 
   { type: "pick", e: "🍞", wenn: "Wenn ich Hunger habe,",
     o: ["dann esse ich ein Brot.", "dann ich esse ein Brot.", "dann ziehe ich eine Jacke an."],
@@ -299,16 +299,16 @@ var TASKS = [
     why: ["", "Nach „dann“ kommt zuerst das Verb: dann feiern wir.", "Wer die Prüfung besteht, muss sie nicht noch einmal machen."],
     tip: "„bestehen“ heißt: Die Prüfung ist gut gegangen." },
 
-  { type: "gap", e: "😴", s: "Wenn ich müde ___, dann gehe ich ins Bett.", o: ["bin", "bist", "ist"],
-    tip: "ich bin, du bist, er ist" },
-  { type: "gap", e: "☀️", s: "Wenn die Sonne scheint, dann ___ wir in den Park.", o: ["gehen", "geht", "gehst"],
-    tip: "wir gehen, ihr geht, du gehst" },
-  { type: "gap", e: "☂️", s: "___ es regnet, dann nehme ich einen Regenschirm.", o: ["Wenn", "Dann", "Und"],
-    tip: "Der erste Teil beginnt mit …" },
-  { type: "gap", e: "💧", s: "Wenn ich Durst habe, ___ trinke ich Wasser.", o: ["dann", "wenn", "aber"],
-    tip: "Wenn …, ___ …" },
-  { type: "gap", e: "🏠", s: "Wenn ich krank bin, dann ___ ich zu Hause.", o: ["bleibe", "bleibst", "bleibt"],
-    tip: "ich bleibe, du bleibst, er bleibt" }
+  { type: "order", e: "⏰", t: ["Wenn", "ich", "früh", "aufstehe", ",", "dann", "kann", "ich", "den Bus", "nehmen"],
+    tip: "„kann“ steht direkt nach „dann“. „nehmen“ steht ganz am Ende." },
+  { type: "order", e: "🤒", t: ["Wenn", "du", "krank", "bist", ",", "dann", "musst", "du", "zum Arzt", "gehen"],
+    tip: "„bist“ steht am Ende vom Wenn-Teil. Nach „dann“ kommt „musst“." },
+  { type: "order", e: "🌧️", t: ["Wenn", "es", "am Wochenende", "regnet", ",", "dann", "bleiben", "wir", "zu Hause"],
+    tip: "„regnet“ steht am Ende vom Wenn-Teil." },
+  { type: "order", e: "📞", t: ["Wenn", "die Schule", "aus", "ist", ",", "dann", "rufe", "ich", "meine Mutter", "an"],
+    tip: "„anrufen“ ist trennbar: „rufe“ kommt nach „dann“, „an“ steht ganz am Ende." },
+  { type: "order", e: "📱", t: ["Wenn", "ich", "mehr Geld", "habe", ",", "dann", "kaufe", "ich", "ein neues Handy"],
+    tip: "Wenn-Teil: Verb am Ende. Dann-Teil: dann + Verb + ich." }
 ];
 
 var LEVELS = { order: "★★★ schwer", pick: "★★☆ mittel", gap: "★☆☆ leicht" };
@@ -494,7 +494,7 @@ function showResult() {
   $("score").textContent = p + " / " + max;
   var r = p / max;
   $("praise").textContent = r >= 0.85 ? "Ausgezeichnet! Du kannst Wenn-dann-Sätze sehr gut." :
-    r >= 0.6 ? "Gut gemacht! Übe die schweren Sätze noch einmal." :
+    r >= 0.6 ? "Gut gemacht! Übe die schweren Sätze am Ende noch einmal." :
     "Du bist auf dem Weg. Lies „So geht’s“ und versuch es noch einmal.";
   $("summary").innerHTML = TASKS.map(function (t, i) {
     var ok = state[i].ok > 0;

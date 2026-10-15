@@ -56,11 +56,11 @@ Szenarien stehen im Array `SCENARIOS` in `verkaufsgespraech.html`. Jedes Szenari
 
 ## Übung: Wenn-dann-Sätze (Deutsch A2)
 
-`wenn-dann.html` ist eine Übungsseite für Smartphones (Internationale Förderklasse, Niveau A2). 15 Sätze, von schwer nach leicht:
+`wenn-dann.html` ist eine Übungsseite für Smartphones (Internationale Förderklasse, Niveau A2). 15 Sätze, von leicht nach schwer:
 
-- **1 bis 5 (schwer):** alle Wörter eines Wenn-dann-Satzes in die richtige Reihenfolge bringen (mit Komma, Modalverben, trennbarem Verb)
+- **1 bis 5 (leicht):** das fehlende Wort einsetzen
 - **6 bis 10 (mittel):** den richtigen Dann-Teil auswählen (Wortstellung und Bedeutung)
-- **11 bis 15 (leicht):** das fehlende Wort einsetzen
+- **11 bis 15 (schwer):** alle Wörter eines Wenn-dann-Satzes in die richtige Reihenfolge bringen (mit Komma, Modalverben, trennbarem Verb)
 
 Jede Aufgabe hat einen Tipp und zwei Versuche (2 Punkte beim ersten, 1 Punkt beim zweiten Versuch). Richtige Sätze werden vorgelesen. Am Ende gibt es eine Übersicht aller Sätze.
 
