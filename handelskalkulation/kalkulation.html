@@ -172,6 +172,13 @@ button, select, input { font: inherit; color: inherit; }
 .nav { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
 .warn { margin-top: 14px; border: 1.5px solid var(--ok); background: var(--ok-soft); border-radius: 12px; padding: 12px 14px; display: grid; gap: 10px; }
 .warn .acts { display: flex; gap: 10px; flex-wrap: wrap; }
+.warn.stop { border-color: var(--bad); background: var(--bad-soft); }
+.field input.missing, .row select.missing { border-color: var(--bad); background: var(--bad-soft); }
+.btn.is-off { opacity: .5; }
+.binfo { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 14px; margin-top: 18px; }
+.binfo > div { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 6px; min-width: 0; }
+.binfo p { font-size: .93rem; }
+.pick-hint { margin-top: 18px; border: 1.5px dashed var(--accent); border-radius: 12px; padding: 12px 14px; color: var(--accent); font-weight: 700; }
 @media (max-width: 420px) { .field input { width: 6.6rem; } .row { gap: 4px 6px; } }
 
 /* ---------- Auswertung ---------- */
@@ -524,8 +531,8 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
 
   /* ================= Fortschritt ================= */
   function loadProgress() {
-    try { const p = JSON.parse(localStorage.getItem(STORE_KEY)); if (p && typeof p === "object") return Object.assign({ passed: {}, best: {}, name: "", branch: "mix" }, p); } catch (e) {}
-    return { passed: {}, best: {}, name: "", branch: "mix" };
+    try { const p = JSON.parse(localStorage.getItem(STORE_KEY)); if (p && typeof p === "object") return Object.assign({ passed: {}, best: {}, name: "", branch: "" }, p); } catch (e) {}
+    return { passed: {}, best: {}, name: "", branch: "" };
   }
   function saveProgress() { try { localStorage.setItem(STORE_KEY, JSON.stringify(PROG)); } catch (e) {} }
   let PROG = loadProgress();
@@ -544,15 +551,28 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
   }
 
   function startLevel(n) {
-    if (!unlocked(n)) return;
-    S = { screen: "task", level: n, tasks: makeRound(n, PROG.branch || "mix"), answers: [], idx: 0, help: false, warn: false, result: null };
+    if (!unlocked(n) || !BRANCH_KEYS.includes(PROG.branch)) return;
+    S = { screen: "task", level: n, tasks: makeRound(n, PROG.branch), answers: [], idx: 0, help: false, warn: false, result: null };
     S.answers = S.tasks.map(() => ({}));
     render();
   }
 
   /* ---------- Startseite ---------- */
+  const BRANCH_KEYS = ["lm", "bk", "mix"];
+  const span = a => Math.min(...a) + "–" + Math.max(...a) + " %";
+  function branchInfo(br) {
+    if (!BRANCH_KEYS.includes(br)) return `<p class="pick-hint">Bitte wählen Sie zuerst Ihren Ausbildungsbetrieb. Die Aufgaben und Zahlen passen sich an diese Waren an.</p>`;
+    const list = br === "mix" ? ["lm", "bk"] : [br];
+    return `<div class="binfo">${list.map(k => {
+      const B = BRANCHES[k];
+      return `<div><span class="eyebrow">${B.label}</span><b>${B.company}, ${B.city}</b>
+        <p><span class="muted">Waren:</span> ${B.products.map(p => esc(p.name)).join(", ")}</p>
+        <p><span class="muted">Typische Werte:</span> Rabatt ${span(B.rabatt)}, Skonto ${span(B.skonto)}, Handlungskosten ${span(B.hk)}, Gewinn ${span(B.gewinn)}, Umsatzsteuer ${k === "lm" ? "7 % (Lebensmittel) oder 19 % (Getränke)" : "19 %"}</p></div>`;
+    }).join("")}</div>`;
+  }
   function renderHome() {
-    const br = PROG.branch || "mix";
+    const br = PROG.branch;
+    const chosen = BRANCH_KEYS.includes(br);
     const cards = LEVELS.map(L => {
       const open = unlocked(L.n), done = !!PROG.passed[L.n], best = PROG.best[L.n];
       let status;
@@ -565,7 +585,7 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
         <h3>${L.title}</h3>
         <ul>${L.items.map(i => `<li>${i}</li>`).join("")}<li>${L.tasks} Aufgaben je Runde</li></ul>
         <div class="foot"><span class="muted" style="font-size:.9rem">Bestanden ab ${PASS} %</span>
-        <button class="btn${done ? " ghost" : ""}" data-start="${L.n}" ${open ? "" : "disabled"}>${!open ? "Gesperrt" : done ? "Wiederholen" : "Stufe " + L.n + " üben"}</button></div>
+        <button class="btn${done ? " ghost" : ""}" data-start="${L.n}" ${open && chosen ? "" : "disabled"}>${!open ? "Gesperrt" : !chosen ? "Erst Betrieb wählen" : done ? "Wiederholen" : "Stufe " + L.n + " üben"}</button></div>
       </article>`;
     }).join("");
 
@@ -582,11 +602,13 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
             ${[["lm", "Lebensmittel"], ["bk", "Bekleidung"], ["mix", "Gemischt"]].map(([k, l]) => `<button data-branch="${k}" aria-pressed="${br === k}">${l}</button>`).join("")}
           </div></div>
       </div>
+      ${branchInfo(br)}
       <div class="levels">${cards}</div>
       <div class="info">
         <div class="panel"><h2>So funktioniert es</h2>
           <ul>
             <li>Rechnen Sie jede Zeile und runden Sie auf Cent. Komma oder Punkt sind beide erlaubt.</li>
+            <li>Erst wenn alle Felder einer Aufgabe ausgefüllt sind, geht es zur nächsten Aufgabe.</li>
             <li>Die Auswertung kommt am Ende der Runde.</li>
             <li>Bestehen Sie eine Stufe mit mindestens ${PASS} %, wird die nächste freigeschaltet.</li>
             <li>Jede Stufe können Sie beliebig oft wiederholen, auch nach dem Bestehen. Bestandene Stufen bleiben freigeschaltet.</li>
@@ -594,8 +616,7 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
             <li>Ihr Fortschritt wird nur auf diesem Gerät gespeichert.</li>
           </ul></div>
         <div class="panel"><h2>Das Kalkulationsschema</h2>
-          <p class="muted" style="font-size:.92rem">Beispiel: Jeans im Modehaus Brüggemann</p>
-          ${exampleSchema()}</div>
+          ${exampleSchema(br)}</div>
       </div>
       <div class="teacher">${S.resetAsk
         ? `<span>Fortschritt auf diesem Gerät wirklich löschen?</span><button class="btn ghost" data-act="reset-yes">Ja, löschen</button><button class="linkbtn" data-act="reset-no">Abbrechen</button>`
@@ -604,12 +625,15 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
     </section>`;
   }
 
-  function exampleSchema() {
-    const t = { start: "lep", startValue: 4000, product: BRANCHES.bk.products[0],
-      steps: [{ key: "rabatt", rate: 15 }, { key: "skonto", rate: 2 }, { key: "bezug", amount: 80 }, { key: "hk", rate: 45 }, { key: "gewinn", rate: 15 }, { key: "ust", rate: 19 }] };
+  function exampleSchema(br) {
+    const t = br === "lm"
+      ? { start: "lep", startValue: 1800, product: BRANCHES.lm.products[0], caption: "Bergkäse im Frischemarkt Kortmann",
+          steps: [{ key: "rabatt", rate: 5 }, { key: "skonto", rate: 2 }, { key: "bezug", amount: 40 }, { key: "hk", rate: 25 }, { key: "gewinn", rate: 8 }, { key: "ust", rate: 7 }] }
+      : { start: "lep", startValue: 4000, product: BRANCHES.bk.products[0], caption: "Jeans im Modehaus Brüggemann",
+          steps: [{ key: "rabatt", rate: 15 }, { key: "skonto", rate: 2 }, { key: "bezug", amount: 80 }, { key: "hk", rate: 45 }, { key: "gewinn", rate: 15 }, { key: "ust", rate: 19 }] };
     t.sol = solve(t);
-    const base = ["vom Listeneinkaufspreis", "vom Zieleinkaufspreis", "je Stück", "vom Bezugspreis", "vom Selbstkostenpreis", "vom Nettoverkaufspreis"];
-    let h = `<div class="schema"><div class="sr"><span class="o"></span><span>Listeneinkaufspreis</span><span class="v">${fmt(t.sol.vals[0])}</span></div>`;
+    const base = ["vom Listeneinkaufspreis", "vom Zieleinkaufspreis", t.product.per, "vom Bezugspreis", "vom Selbstkostenpreis", "vom Nettoverkaufspreis"];
+    let h = `<p class="muted" style="font-size:.92rem">Beispiel: ${esc(t.caption)}, Preise ${t.product.per}</p><div class="schema"><div class="sr"><span class="o"></span><span>Listeneinkaufspreis</span><span class="v">${fmt(t.sol.vals[0])}</span></div>`;
     t.steps.forEach((s, i) => {
       const D = STEP[s.key];
       h += `<div class="sr"><span class="o">${D.op < 0 ? "−" : "+"}</span><span>${D.amount} <small>${s.rate ? s.rate + " % " : ""}${base[i]}</small></span><span class="v">${fmt(t.sol.amts[i])}</span></div>`;
@@ -625,14 +649,15 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
     const labels = chainLabels(t);
     const id = k => `f-${S.idx}-${k}`;
     const val = k => esc(ans[k] || "");
-    const input = (k, lab) => `<span class="field"><input id="${id(k)}" data-k="${k}" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="${esc(lab)} in Euro" value="${val(k)}"><span class="unit">€</span></span>`;
+    const miss = S.warn || [];
+    const input = (k, lab) => `<span class="field"><input id="${id(k)}" data-k="${k}"${miss.includes(k) ? ' class="missing" aria-invalid="true"' : ""} inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="${esc(lab)} in Euro" value="${val(k)}"><span class="unit">€</span></span>`;
 
     let rows = `<div class="row given"><span class="op"></span><span class="lbl">${labels[0]}</span><span class="val">${fmt(t.startValue)}</span></div>`;
     t.steps.forEach((s, i) => {
       const D = STEP[s.key];
       let chip = "";
       if (s.key === "ust" && t.ustSelect) {
-        chip = `<select id="${id("ust")}" data-k="ust" aria-label="Steuersatz"><option value="">Satz?</option><option value="7"${ans.ust === "7" ? " selected" : ""}>7 %</option><option value="19"${ans.ust === "19" ? " selected" : ""}>19 %</option></select>`;
+        chip = `<select id="${id("ust")}" data-k="ust" aria-label="Steuersatz"${miss.includes("ust") ? ' class="missing" aria-invalid="true"' : ""}><option value="">Satz?</option><option value="7"${ans.ust === "7" ? " selected" : ""}>7 %</option><option value="19"${ans.ust === "19" ? " selected" : ""}>19 %</option></select>`;
       } else if (D.type === "rate") chip = `<span class="chip">${s.rate} %</span>`;
       rows += `<div class="row"><span class="op">${D.op < 0 ? "−" : "+"}</span><span class="lbl"><label for="${id("a" + i)}">${D.amount}</label>${chip}</span>${input("a" + i, D.amount)}`;
       if (L.help) rows += `<div class="help">${D.type === "fixed" ? "Betrag aus dem Angebot übernehmen" : `${short(labels[i])} × ${s.rate} ÷ 100`}</div>`;
@@ -645,7 +670,7 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
 
     const dots = S.tasks.map((_, i) => `<span class="${i === S.idx ? "on" : isFilled(i) ? "done" : ""}"></span>`).join("");
     const isLast = S.idx === S.tasks.length - 1;
-    const empties = S.warn ? countEmpty() : 0;
+    const ready = missingKeys(S.idx).length === 0;
 
     app.innerHTML = `<section class="screen">
       <div class="topbar">
@@ -666,11 +691,10 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
             <div class="sheet-head"><h3>Kalkulationsblatt</h3>${L.help ? `<button class="linkbtn" data-act="help">${S.help ? "Rechenweg ausblenden" : "Rechenweg zeigen"}</button>` : `<span class="muted" style="font-size:.88rem">Beträge in Euro, auf Cent gerundet</span>`}</div>
             ${rows}
           </div>
-          ${S.warn ? `<div class="warn" role="alert"><p><b>${empties} ${empties === 1 ? "Feld ist" : "Felder sind"} noch leer.</b> Leere Felder zählen als Fehler.</p>
-            <div class="acts"><button class="btn" data-act="eval-force">Trotzdem auswerten</button><button class="btn ghost" data-act="warn-off">Weiterrechnen</button></div></div>` : ""}
+          ${miss.length ? `<div class="warn stop" role="alert"><p><b>Bitte füllen Sie alle Felder aus.</b> ${miss.length === 1 ? "Ein Feld ist" : miss.length + " Felder sind"} noch leer oder enthalten keine gültige Zahl (z. B. 12,50). Erst dann geht es weiter.</p></div>` : ""}
           <div class="nav">
             <button class="btn ghost" data-act="prev" ${S.idx === 0 ? "disabled" : ""}>← Vorherige Aufgabe</button>
-            ${isLast ? `<button class="btn" data-act="eval" id="next-btn">Auswerten</button>` : `<button class="btn" data-act="next" id="next-btn">Nächste Aufgabe →</button>`}
+            ${isLast ? `<button class="btn${ready ? "" : " is-off"}" data-act="eval" id="next-btn" aria-disabled="${!ready}">Auswerten</button>` : `<button class="btn${ready ? "" : " is-off"}" data-act="next" id="next-btn" aria-disabled="${!ready}">Nächste Aufgabe →</button>`}
           </div>
         </div>
       </div>
@@ -683,7 +707,19 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
     return k;
   }
   function isFilled(i) { return fieldKeys(S.tasks[i]).every(k => (S.answers[i][k] || "").trim() !== ""); }
-  function countEmpty() { return S.tasks.reduce((n, t, i) => n + fieldKeys(t).filter(k => !(S.answers[i][k] || "").trim()).length, 0); }
+  function missingKeys(i) {
+    return fieldKeys(S.tasks[i]).filter(k => {
+      const v = (S.answers[i][k] || "").trim();
+      return !v || (k !== "ust" && Number.isNaN(parseMoney(v)));
+    });
+  }
+  function blockIfMissing() {
+    const m = missingKeys(S.idx);
+    if (!m.length) return false;
+    S.warn = m; renderTask();
+    const el = app.querySelector(".missing"); if (el) el.focus();
+    return true;
+  }
 
   function evaluateRound() {
     const per = S.tasks.map((t, i) => evaluateTask(t, S.answers[i]));
@@ -765,11 +801,14 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
     if (act === "home") { S.screen = "home"; S.resetAsk = false; return render(); }
     if (act === "help") { S.help = !S.help; document.getElementById("sheet").classList.toggle("show-help", S.help); b.textContent = S.help ? "Rechenweg ausblenden" : "Rechenweg zeigen"; return; }
     if (act === "prev") { S.idx = Math.max(0, S.idx - 1); S.warn = false; return render(); }
-    if (act === "next") { S.idx = Math.min(S.tasks.length - 1, S.idx + 1); return render(); }
-    if (act === "eval") { if (countEmpty() > 0) { S.warn = true; renderTask(); const w = app.querySelector(".warn"); if (w) w.scrollIntoView({ block: "center" }); return; } return evaluateRound(); }
-    if (act === "eval-force") return evaluateRound();
+    if (act === "next") { if (blockIfMissing()) return; S.warn = false; S.idx = Math.min(S.tasks.length - 1, S.idx + 1); return render(); }
+    if (act === "eval") {
+      if (blockIfMissing()) return;
+      const open = S.tasks.findIndex((_, i) => missingKeys(i).length);
+      if (open >= 0) { S.idx = open; renderTask(); return blockIfMissing(); }
+      return evaluateRound();
+    }
     if (act === "same") { S.answers = S.tasks.map(() => ({})); S.idx = 0; S.warn = false; S.result = null; S.screen = "task"; return render(); }
-    if (act === "warn-off") { S.warn = false; const first = [...app.querySelectorAll("[data-k]")].find(el => !el.value.trim()); renderTask(); const el = first && document.getElementById(first.id); if (el) el.focus(); return; }
     if (act === "reset") { S.resetAsk = true; return renderHome(); }
     if (act === "reset-no") { S.resetAsk = false; return renderHome(); }
     if (act === "reset-yes") { const name = PROG.name, branch = PROG.branch; PROG = { passed: {}, best: {}, name, branch }; saveProgress(); S.resetAsk = false; return renderHome(); }
@@ -778,11 +817,18 @@ details.res > summary .t { flex: 1; font-weight: 700; min-width: 12rem; }
   app.addEventListener("input", e => {
     const el = e.target;
     if (el.id === "name") { PROG.name = el.value.trim(); saveProgress(); return; }
-    if (el.dataset.k && S.screen === "task") S.answers[S.idx][el.dataset.k] = el.value;
+    if (el.dataset.k && S.screen === "task") { S.answers[S.idx][el.dataset.k] = el.value; refreshReady(el); }
   });
+  function refreshReady(el) {
+    const m = missingKeys(S.idx);
+    if (el && !m.includes(el.dataset.k)) { el.classList.remove("missing"); el.removeAttribute("aria-invalid"); }
+    if (Array.isArray(S.warn)) { S.warn = S.warn.filter(k => m.includes(k)); if (!S.warn.length) { S.warn = false; const w = app.querySelector(".warn"); if (w) w.remove(); } }
+    const nb = document.getElementById("next-btn");
+    if (nb) { nb.classList.toggle("is-off", m.length > 0); nb.setAttribute("aria-disabled", String(m.length > 0)); }
+  }
   app.addEventListener("change", e => {
     const el = e.target;
-    if (el.tagName === "SELECT" && el.dataset.k && S.screen === "task") S.answers[S.idx][el.dataset.k] = el.value;
+    if (el.tagName === "SELECT" && el.dataset.k && S.screen === "task") { S.answers[S.idx][el.dataset.k] = el.value; refreshReady(el); }
   });
   app.addEventListener("keydown", e => {
     if (e.key !== "Enter" || S.screen !== "task" || !e.target.dataset.k) return;
