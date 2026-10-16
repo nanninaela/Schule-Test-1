@@ -360,7 +360,8 @@ input[type=text]:focus-visible, button:focus-visible { outline: 3px solid var(--
         ] },
         { h: "Unentschlossene Kunden", p: "S. 177", list: [
           "Tun sich schwer mit der Entscheidung, sind unsicher und stellen viele Fragen.",
-          "Sie wägen lange Vor- und Nachteile ab und schwanken in ihren Entscheidungen. Wie Sie ihnen helfen, lesen Sie im Buch auf der folgenden Seite."
+          "Sie wägen lange Vor- und Nachteile ab und schwanken in ihren Entscheidungen.",
+          "Tipp: Legen Sie nur wenige passende Artikel vor, stellen Sie Vor- und Nachteile klar gegenüber und geben Sie eine Empfehlung, die zu den Wünschen passt."
         ] }
       ],
       qs: [
@@ -428,6 +429,7 @@ input[type=text]:focus-visible, button:focus-visible { outline: 3px solid var(--
       <div class="task">
         <h3>Ihr Arbeitsauftrag</h3>
         <ol>
+          <li>Arbeiten Sie allein auf Ihrem eigenen Handy. Die Aufgaben erscheinen bei jeder Person in einer anderen Reihenfolge.</li>
           <li>Lesen Sie die Seiten der jeweiligen Station im Buch.</li>
           <li>Lesen Sie in der App „Das Wichtigste“ und bearbeiten Sie danach die Aufgaben.</li>
           <li>Bearbeiten Sie alle fünf Stationen. Sie können jede Station wiederholen. Es zählt Ihr bestes Ergebnis.</li>
@@ -437,6 +439,7 @@ input[type=text]:focus-visible, button:focus-visible { outline: 3px solid var(--
       <label class="field" for="name">Ihr Name (für den Nachweis)
         <input type="text" id="name" autocomplete="name" placeholder="Vorname Nachname" value="${esc(state.name)}">
       </label>
+      <p class="fix" id="nameHint" hidden>Bitte tragen Sie zuerst Ihren Namen ein. Er erscheint auf Ihrem Nachweis.</p>
       <div class="stations">
         ${STATIONS.map((s, i) => {
           const b = state.saved.best[i];
@@ -449,8 +452,15 @@ input[type=text]:focus-visible, button:focus-visible { outline: 3px solid var(--
       </div>
       <p class="note">${done} von ${STATIONS.length} Stationen erledigt. Ihre Ergebnisse werden nur auf diesem Gerät gespeichert.</p>`;
     const nameEl = document.getElementById("name");
-    nameEl.addEventListener("input", () => { state.name = nameEl.value; state.saved.name = nameEl.value; save(); });
-    app.querySelectorAll(".station").forEach(b => b.addEventListener("click", () => intro(+b.dataset.st)));
+    nameEl.addEventListener("input", () => { state.name = nameEl.value; state.saved.name = nameEl.value; save(); if (nameEl.value.trim()) document.getElementById("nameHint").hidden = true; });
+    app.querySelectorAll(".station").forEach(b => b.addEventListener("click", () => {
+      if (!state.name.trim()) {
+        nameEl.focus();
+        document.getElementById("nameHint").hidden = false;
+        return;
+      }
+      intro(+b.dataset.st);
+    }));
     setBar([{ id: "toCert", label: "Zum Nachweis", disabled: done === 0, on: certificate }]);
     top();
   }
@@ -478,11 +488,12 @@ input[type=text]:focus-visible, button:focus-visible { outline: 3px solid var(--
   // ---------------- Aufgaben ----------------
   function startQuiz(i) {
     state.st = i; state.qi = 0; state.score = 0; state.wrong = [];
+    state.qs = shuffle(STATIONS[i].qs);
     question();
   }
   function question() {
     state.view = "q"; state.answered = false; state.sel = [];
-    const s = STATIONS[state.st], q = s.qs[state.qi];
+    const s = STATIONS[state.st], q = state.qs[state.qi];
     const pct = (state.qi / s.qs.length) * 100;
     let body = "";
     if (q.t === "mc") {
@@ -540,7 +551,7 @@ input[type=text]:focus-visible, button:focus-visible { outline: 3px solid var(--
   }
   function answerMc(k) {
     if (state.answered) return;
-    const q = STATIONS[state.st].qs[state.qi];
+    const q = state.qs[state.qi];
     app.querySelectorAll(".opt").forEach(b => {
       const bk = +b.dataset.k; b.disabled = true;
       if (bk === q.a) b.classList.add("right");
@@ -551,7 +562,7 @@ input[type=text]:focus-visible, button:focus-visible { outline: 3px solid var(--
   }
   function answerTf(v) {
     if (state.answered) return;
-    const q = STATIONS[state.st].qs[state.qi];
+    const q = state.qs[state.qi];
     app.querySelectorAll(".opt").forEach(b => {
       const bv = b.dataset.v === "1"; b.disabled = true;
       if (bv === q.a) b.classList.add("right");
@@ -561,7 +572,7 @@ input[type=text]:focus-visible, button:focus-visible { outline: 3px solid var(--
   }
   function answerSort() {
     if (state.answered) return;
-    const q = STATIONS[state.st].qs[state.qi];
+    const q = state.qs[state.qi];
     let got = 0;
     app.querySelectorAll(".sort-item").forEach(it => {
       const k = +it.dataset.k, should = q.items[k][1], ok = state.sel[k] === should;
@@ -612,7 +623,8 @@ input[type=text]:focus-visible, button:focus-visible { outline: 3px solid var(--
     let got = 0, max = 0, done = 0;
     STATIONS.forEach((s, i) => { max += stationMax(s); if (state.saved.best[i] != null) { got += state.saved.best[i]; done++; } });
     const pct = Math.round(got / max * 100);
-    const date = new Date().toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+    const now = new Date();
+    const date = now.toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long", year: "numeric" }) + ", " + now.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }) + " Uhr";
     app.innerHTML = `
       <div class="kicker">Nachweis · Lernfeld 10</div>
       <h2>Kundenvielfalt: Kundengruppen und Kundentypen</h2>

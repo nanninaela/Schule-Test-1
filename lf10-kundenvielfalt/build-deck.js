@@ -407,7 +407,7 @@ const HEX = { ink: "18202B", accent: "2346A0", good: "1D7A4C", bad: "B5352A", ok
     ["Skeptisch", "„Stimmt das wirklich? Die Bewertungen sind gemischt.“", "Misstrauisch, recherchiert, entscheidet nach reiflicher Überlegung.", "Offen und ehrlich, nicht übertreiben, Garantie oder Probezeit anbieten."],
     ["Interessiert", "„Ist die Jacke wasserdicht? Wie pflege ich sie?“", "Will eine bestimmte Ware, braucht mehr Informationen.", "Umfassend beraten, z. B. mit Broschüren. Vorteile zeigen."],
     ["Gesprächsfreudig", "„Mein Enkel hat auch so eine Uhr. Wie finden Sie die?“", "Erzählt gern, stellt viele Fragen, Einkauf als Erlebnis.", "Echtes Interesse zeigen, aktiv zuhören, ausführlich antworten."],
-    ["Unentschlossen", "„Die blaue oder doch die graue? Oder die erste?“", "Unsicher, wägt lange ab, schwankt.", "Wie Sie helfen, steht im Buch auf S. 178."]
+    ["Unentschlossen", "„Die blaue oder doch die graue? Oder die erste?“", "Unsicher, wägt lange ab, schwankt.", "Wenige Artikel vorlegen, Vor- und Nachteile klar gegenüberstellen, Empfehlung geben."]
   ];
   async function charSlide(list, kicker) {
     const sl = content("Kundentypen", kicker, "Kundentypen nach dem Charakter");

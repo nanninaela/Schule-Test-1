@@ -59,6 +59,8 @@ Szenarien stehen im Array `SCENARIOS` in `verkaufsgespraech.html`. Jedes Szenari
 Material zu den Buchseiten 168–177 („Ausbildung im Einzelhandel“, Kapitel 1 Kundenvielfalt) im Ordner `lf10-kundenvielfalt/`. Gedacht für eine Stunde ohne Lehrkraft: Die Schülerinnen und Schüler arbeiten selbstständig am Smartphone. Alle Texte sprechen sie mit „Sie“ an.
 
 - `uebung.html`: Online-Übung (Quelle, wird als Claude-Artifact veröffentlicht). Fünf Stationen mit je zehn Aufgaben (Auswahl, richtig/falsch, Zuordnen). Vor jeder Station steht eine Zusammenfassung mit Buchseiten. Nach jeder Aufgabe gibt es eine Erklärung mit Seitenangabe. Am Ende steht ein Nachweis mit Name, Datum, Punkten und Note zum Abfotografieren.
+
+  Die Übung läuft vollständig im Browser des jeweiligen Handys, ohne gemeinsamen Server und ohne Anmeldung. Beliebig viele Schülerinnen und Schüler können gleichzeitig arbeiten (getestet mit 20 parallelen Durchläufen). Vor dem Start muss jede Person ihren Namen eintragen. Die Reihenfolge der Aufgaben und Antworten wird bei jedem Durchgang neu gemischt, damit Sitznachbarn nicht einfach abschreiben. Der Nachweis zeigt Datum und Uhrzeit.
 - `index.html`: eigenständige Version der Übung, erzeugt mit `./build.sh`
 - `Kundenvielfalt_LF10.pptx` (20 Folien) und `Kundenvielfalt_LF10.pdf`: Präsentation im Hochformat, damit sie auf dem Smartphone den Bildschirm füllt. Die PDF lässt sich auf jedem Handy ohne PowerPoint öffnen. Erzeugt mit `build-deck.js`.
 
